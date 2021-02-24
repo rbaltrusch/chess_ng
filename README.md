@@ -23,6 +23,16 @@ Currently, the AI just picks a random move each turn. This should be improved us
 
 With weighted square parameters being given to improve the positional play of the AI, it seems to be a logical next step to improve the AI using machine learning by combining random parameter adjustments with a genetic algorithm.
 
+## Getting started
+
+To get a copy of this repository, simply open up git bash in an empty folder and use the command:
+
+		$ git clone https://github.com/rbaltrusch/chess_engine
+
+To install all python dependencies, run the following in your command line:
+
+    python -m pip install -r requirements.txt
+
 ## Python
 
 Written in Python 3.8.3
