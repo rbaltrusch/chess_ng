@@ -35,7 +35,7 @@ To install all python dependencies, run the following in your command line:
 
 ## Python
 
-Written in Python 3.8.3
+Written in Python 3.8.3.
 
 ## License
 
