@@ -9,4 +9,4 @@ X_POSITIONS = {k: v for k, v in zip(range(8), 'abcdefgh')}
 
 def convert(position):
     x, y = position
-    return X_POSITIONS[x] + str(y + 1)
+    return X_POSITIONS[x] + str(8 - y)
