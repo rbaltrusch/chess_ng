@@ -27,7 +27,7 @@ With weighted square parameters being given to improve the positional play of th
 
 To get a copy of this repository, simply open up git bash in an empty folder and use the command:
 
-		$ git clone https://github.com/rbaltrusch/chess_engine
+    $ git clone https://github.com/rbaltrusch/chess_engine
 
 To install all python dependencies, run the following in your command line:
 
