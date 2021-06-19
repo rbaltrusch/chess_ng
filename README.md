@@ -17,7 +17,7 @@ The engine currently supports basic moves for all chess pieces, as well as captu
 
 ### Improved AI
 
-Currently, the AI just picks a random move each turn. This should be improved using a [minimax](https://en.wikipedia.org/wiki/Minimax) algorithm and weighted squares with a priority on the centre of the chess board.
+Currently, the AI just picks a random move each turn. This should be improved using a [minimax](https://en.wikipedia.org/wiki/Minimax) algorithm and weighted squares, with a priority on the centre of the chess board.
 
 ### Machine learning
 
