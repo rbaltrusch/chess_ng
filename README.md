@@ -1,3 +1,6 @@
+[![Unit tests](https://github.com/rbaltrusch/chess_engine/actions/workflows/pytest-unit-tests.yml/badge.svg)](https://github.com/rbaltrusch/chess_engine/actions/workflows/pytest-unit-tests.yml)
+[![Pylint](https://github.com/rbaltrusch/chess_engine/actions/workflows/pylint.yml/badge.svg)](https://github.com/rbaltrusch/chess_engine/actions/workflows/pylint.yml)
+
 # Chess Engine
 
 This is a small chess engine written in Python. It is currently still a work in progress.
