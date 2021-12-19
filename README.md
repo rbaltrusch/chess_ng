@@ -1,5 +1,6 @@
 [![Unit tests](https://github.com/rbaltrusch/chess_engine/actions/workflows/pytest-unit-tests.yml/badge.svg)](https://github.com/rbaltrusch/chess_engine/actions/workflows/pytest-unit-tests.yml)
 [![Pylint](https://github.com/rbaltrusch/chess_engine/actions/workflows/pylint.yml/badge.svg)](https://github.com/rbaltrusch/chess_engine/actions/workflows/pylint.yml)
+[![License: MIT](https://img.shields.io/badge/License-MIT-purple.svg)](https://opensource.org/licenses/MIT)
 
 # Chess Engine
 
