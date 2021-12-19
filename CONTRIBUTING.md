@@ -1,10 +1,12 @@
-# Contributions to the Bach Generator
+# Contributions to the Chess Engine
 
-Welcome to the Bach Generator and thanks for considering to contribute to this repository! Every contribution is welcome, no matter how small or large.
+Welcome to the Chess Engine and thanks for considering to contribute to this repository! Every contribution is welcome, no matter how small or large.
 
 ## Open points
 
-There are currently no large plans for this repository, but this is not a problem! Simply submit an issue that details your contribution idea and submit a pull request to fix that issue.
+There are currently no large plans for this repository (although there are still many open points, see [here](README.md#missing-features) and [here](README.md#features-planned-down-the-line)).
+
+If you want to submit a pull request for an improvement which is not currently specified in any issue, simply submit an issue that details your contribution idea and submit a pull request to fix it.
 
 ## Setting up your branch
 
