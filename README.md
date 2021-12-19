@@ -33,6 +33,10 @@ To install all python dependencies, run the following in your command line:
 
     python -m pip install -r requirements.txt
 
+## Contributions
+
+All contributions are welcome! All details can be found in the [contribution guidelines](CONTRIBUTING.md).
+
 ## Python
 
 Written in Python 3.8.3.
