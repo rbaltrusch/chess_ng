@@ -50,7 +50,7 @@ class Move:
                     continue
                 break
 
-            is_enemy = square.representation[-1] != team
+            is_enemy = square.team != team
             if self.can_capture and is_enemy and self._check_squares_between(squares, y, coord):
                 yield other_coord, y
 
@@ -94,7 +94,7 @@ class BishopMove():
             if square is None:
                 yield (x_, y_)
             else:
-                if square.representation[-1] != team: #is enemy
+                if square.team != team:
                     yield (x_, y_)
                 break
 
