@@ -6,21 +6,21 @@ Created on Mon Feb  8 13:33:57 2021
 """
 
 from chess_engine import move
-from chess_engine.util import convert
+from chess_engine.util import convert, convert_str
 from chess_engine.consts import PAWN, KNIGHT, BISHOP, ROOK, QUEEN, KING
 from chess_engine.move import InitialPawnMove
 
 class Piece:
     def __init__(self, moves, position, representation):
         self.moves = moves
-        self.position = position
+        self.position = convert_str(position) if isinstance(position, str) else position
         self.representation = representation
         self.team = representation[-1]
         self.captured = False
         self.position_history = []
 
     def __repr__(self):
-        return f'{self.__class__.__name__}{self.position}'
+        return f'{self.__class__.__name__}({convert(self.position)})'
 
     def compute_valid_moves(self, board):
         valid_squares = []
