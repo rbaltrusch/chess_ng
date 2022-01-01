@@ -6,54 +6,53 @@ Created on Mon Feb  8 15:19:32 2021
 """
 
 import re
+
 from colorama import Fore, Back
-from chess_engine.consts import WHITE, BLACK, EMPTY
+from chess_engine.consts import WHITE
 
 class Board:
-    def __init__(self, board):
-        self.board = board
+    def __init__(self, pieces, size):
+        self.pieces = {piece.position: piece for piece in pieces}
+        self.size = size
 
     def __repr__(self):
-        for y, row in enumerate(self.board):
-            for x, square in enumerate(row):
+        for y in range(self.size):
+            for x in range(self.size):
                 if y % 2:
                     background = Back.BLACK if x % 2 else Back.WHITE
                 else:
                     background = Back.WHITE if x % 2 else Back.BLACK
 
-                if '1' in square:
-                    foreground = Fore.GREEN
-                elif '2' in square:
-                    foreground = Fore.RED
+                piece = self[x, y]
+                if piece is not None:
+                    foreground = Fore.GREEN if WHITE in piece.representation else Fore.RED
+                    representation = piece.representation
                 else:
                     foreground = Fore.LIGHTBLACK_EX
+                    representation = '  '
 
-                square = re.sub('[12]', ' ', square)
+                square = re.sub('[12]', ' ', representation)
                 print(background + foreground + square, end='')
             print()
         return ''
 
     def __iter__(self):
-        for row in self.board:
-            yield row
+        for y in range(self.size):
+            yield [self[x, y] for x in range(self.size)]
 
     def __getitem__(self, value):
-        return self.board[value]
+        return self.pieces.get(value)
 
-    def update(self, pieces):
-        self.board = [['  ' for _ in range(8)] for _ in range(8)]
-        for piece in pieces[WHITE] + pieces[BLACK]:
-            x, y = piece.position
-            self.board[y][x] = piece.representation
+    def move_piece(self, piece, position):
+        self.pieces.pop(piece.position)
+        piece.move_to(position)
+        self.pieces[piece.position] = piece
 
     def is_empty_at(self, position):
-        x, y = position
-        return self.board[y][x] == EMPTY
+        return self[position] is None
 
-    @staticmethod
-    def capture_at(pieces, position):
-        for piece in pieces:
-            if piece.position == position:
-                piece.captured = True
-                print(f'Captured {piece}')
-                break
+    def capture_at(self, position):
+        if not self.is_empty_at(position):
+            piece = self.pieces.pop(position)
+            piece.captured = True
+            print(f'Captured {piece}')

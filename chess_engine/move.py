@@ -6,7 +6,6 @@ Created on Mon Feb  8 12:56:04 2021
 """
 
 from itertools import takewhile
-from chess_engine.consts import EMPTY
 
 class Move:
     def __init__(self, range_, direction=1, forward_only=False, horz_move=False, vert_move=False, can_capture=False):
@@ -26,7 +25,7 @@ class Move:
             horz_moves = list(self._compute_valid_moves(y, x, squares, team))
 
         if self.horz_move:
-            squares = board[y]
+            squares = list(board)[y]
             vert_moves = [(x, y) for y, x in self._compute_valid_moves(x, y, squares, team)]
         return horz_moves + vert_moves
 
@@ -45,23 +44,20 @@ class Move:
             if y == coord:
                 continue
 
-            is_enemy = square[-1] != team
-
-            if not is_enemy and square != EMPTY:
-                break
-
-            if square == EMPTY and self._check_squares_between(squares, y, coord):
-                yield other_coord, y
-            else:
-                if self.can_capture and is_enemy and self._check_squares_between(squares, y, coord):
+            if square is None:
+                if self._check_squares_between(squares, y, coord):
                     yield other_coord, y
+                    continue
                 break
+
+            is_enemy = square.representation[-1] != team
+            if self.can_capture and is_enemy and self._check_squares_between(squares, y, coord):
+                yield other_coord, y
 
     def _check_squares_between(self, squares, y, coord):
         end = y - 1 if self.can_capture else y
         squares_between = squares[y:coord] if y <= coord else squares[coord+1:end]
-        all_empty = all(square == EMPTY for square in squares_between)
-        return all_empty
+        return all(square is None for square in squares_between)
 
 class BishopMove():
     def __init__(self, range_, direction=1, forward_only=False):
@@ -87,7 +83,7 @@ class BishopMove():
         end_y, y_step = (y - self.range, -1) if min_y else (y + self.range, 1)
         get_indices = lambda start, stop, step: takewhile(lambda x: 0 <= x < 8, range(start, stop, step))
         indices = list(zip(get_indices(x, end_x, x_step), get_indices(y, end_y, y_step)))
-        squares = [board[y][x] for x, y in indices]
+        squares = [board[x, y] for x, y in indices]
         if squares:
             squares.pop(0)
 
@@ -95,10 +91,10 @@ class BishopMove():
             if square == position:
                 continue
 
-            if square == EMPTY:
+            if square is None:
                 yield (x_, y_)
             else:
-                if square[-1] != team: #is enemy
+                if square.representation[-1] != team: #is enemy
                     yield (x_, y_)
                 break
 

@@ -30,7 +30,7 @@ class Piece:
         return list(set(valid_squares))
 
     def move_to(self, position):
-        print(f'{self.representation} from {convert(self.position)} to {convert(position)}')
+        print(f'{self.team}: {self.representation} from {convert(self.position)} to {convert(position)}')
         self.position = position
         self.position_history.append(position)
 
