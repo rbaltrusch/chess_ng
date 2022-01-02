@@ -13,7 +13,6 @@ import time
 
 import py
 
-PACKAGE_NAME = 'chess_engine'
 REPORTS_PATH = 'reports'
 
 def run_tests(args):
@@ -21,7 +20,7 @@ def run_tests(args):
     and open the report in the browser.
     """
     script_dir = os.path.abspath(os.path.dirname(__file__))
-    package_path = os.path.join(script_dir, '..', PACKAGE_NAME)
+    package_path = os.path.join(script_dir, '..')
     sys.path.append(package_path)
 
     timestamp = datetime.datetime.now().strftime('%Y%m%d_%H%M%S')
