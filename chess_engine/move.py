@@ -60,10 +60,11 @@ class Move:
         return all(square is None for square in squares_between)
 
 class BishopMove():
-    def __init__(self, range_, direction=1, forward_only=False):
+    def __init__(self, range_, direction=1, forward_only=False, must_capture=False):
         self.range = range_
         self.direction = direction
         self.forward_only = forward_only
+        self.must_capture = must_capture
 
     def compute_valid_moves(self, position, board, team):
         generators_forward = [self._compute_valid_moves(position, board, team, min_x=False, min_y=False),
@@ -79,23 +80,22 @@ class BishopMove():
 
     def _compute_valid_moves(self, position, board, team, min_x=False, min_y=False):
         x, y = position
-        end_x, x_step = (x - self.range, -1) if min_x else (x + self.range, 1)
-        end_y, y_step = (y - self.range, -1) if min_y else (y + self.range, 1)
+        end_x, x_step = (x - self.range - 1, -1) if min_x else (x + self.range + 1, 1)
+        end_y, y_step = (y - self.range - 1, -1) if min_y else (y + self.range + 1, 1)
         get_indices = lambda start, stop, step: takewhile(lambda x: 0 <= x < 8, range(start, stop, step))
         indices = list(zip(get_indices(x, end_x, x_step), get_indices(y, end_y, y_step)))
         squares = [board[x, y] for x, y in indices]
-        if squares:
-            squares.pop(0)
 
-        for (x_, y_), square in zip(indices, squares):
-            if square == position:
+        for pos, square in zip(indices, squares):
+            if pos == position:
                 continue
 
             if square is None:
-                yield (x_, y_)
+                if not self.must_capture:
+                    yield pos
             else:
                 if square.team != team:
-                    yield (x_, y_)
+                    yield pos
                 break
 
 class InitialPawnMove(Move):
@@ -111,7 +111,7 @@ class PawnMove(Move):
 class PawnCapture(BishopMove):
     def __init__(self, direction):
         range_ = 1
-        super().__init__(range_, direction, forward_only=True)
+        super().__init__(range_, direction, forward_only=True, must_capture=True)
 
 class EnPassantMove:
     pass
