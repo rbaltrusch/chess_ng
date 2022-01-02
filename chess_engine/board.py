@@ -8,10 +8,11 @@ import re
 from typing import List
 from typing import Tuple
 
-from chess_engine.consts import WHITE
-from chess_engine.piece import Piece
 from colorama import Back
 from colorama import Fore
+
+from .consts import WHITE
+from .piece import Piece
 
 class Board:
     """Board class. Contains all the pieces on the chess board"""
