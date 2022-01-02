@@ -44,7 +44,7 @@ def run_tests(args):
     #pylint: disable=E1101
     exit_code = py.test.cmdline.main(args=command_line_args)
 
-    if not args.report:
+    if args.report:
         if args.open_in_browser:
             subprocess.call(f'start {report_filepath}', shell=True) #open test report
             subprocess.call('start htmlcov/index.html', shell=True) #open coverage report
