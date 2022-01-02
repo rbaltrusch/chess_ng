@@ -1,5 +1,7 @@
 # .coveragerc to control coverage.py (pytest-cov)
 
 [run]
+source = ..
 omit =
     ../main.py,
+    unit
