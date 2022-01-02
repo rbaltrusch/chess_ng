@@ -4,12 +4,15 @@ Created on Sat Jan  1 12:17:30 2022
 
 @author: richa
 """
-
 import pytest
-
-from chess_engine.util import convert, convert_str
-from chess_engine.piece import Pawn, Knight, Bishop, Rook, Queen
 from chess_engine.board import Board
+from chess_engine.piece import Bishop
+from chess_engine.piece import Knight
+from chess_engine.piece import Pawn
+from chess_engine.piece import Queen
+from chess_engine.piece import Rook
+from chess_engine.util import convert
+from chess_engine.util import convert_str
 
 @pytest.mark.parametrize("direction,position", [(-1, "a2"), (1, "a7")])
 def test_initial_pawn(direction, position):
@@ -53,7 +56,8 @@ def test_pawn_capture(position):
                                     ])
 def test_other_pawn_capture(class_, position):
     piece = Pawn(direction=-1, position='b2', representation='o1')
-    piece2 = class_(direction=-1, position=position, representation='o2')
+    direction = 1
+    piece2 = class_(direction, position=position, representation='o2')
     board = Board(pieces=[piece, piece2], size=8)
 
     moves = piece.compute_valid_moves(board)
