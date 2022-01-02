@@ -4,13 +4,19 @@ Created on Mon Feb  8 13:33:57 2021
 
 @author: Korean_Crimson
 """
-
-from typing import Tuple, List
+from typing import List
+from typing import Tuple
 
 from chess_engine import move
-from chess_engine.util import convert, convert_str
-from chess_engine.consts import PAWN, KNIGHT, BISHOP, ROOK, QUEEN, KING
+from chess_engine.consts import BISHOP
+from chess_engine.consts import KING
+from chess_engine.consts import KNIGHT
+from chess_engine.consts import PAWN
+from chess_engine.consts import QUEEN
+from chess_engine.consts import ROOK
 from chess_engine.move import InitialPawnMove
+from chess_engine.util import convert
+from chess_engine.util import convert_str
 
 class Piece:
     """Piece class. Needs to be subclassed by the various chess pieces"""
@@ -36,7 +42,8 @@ class Piece:
 
     def move_to(self, position) -> None:
         """Moves the piece to the specified position and adds it to the position history"""
-        print(f'{self.team}: {self.representation} from {convert(self.position)} to {convert(position)}')
+        pos_old = convert(self.position)
+        print(f'{self.team}: {self.representation} from {pos_old} to {convert(position)}')
         self.position = position
         self.position_history.append(position)
 
@@ -44,7 +51,9 @@ class Pawn(Piece):
     """Pawn class. Contains all the pawn moves"""
 
     def __init__(self, direction, position, representation):
-        moves = [move.InitialPawnMove(direction), move.PawnMove(direction), move.PawnCapture(direction)]
+        moves = [move.InitialPawnMove(direction),
+                 move.PawnMove(direction),
+                 move.PawnCapture(direction)]
         super().__init__(moves, position, representation)
 
     def move_to(self, position):
@@ -56,36 +65,36 @@ class Pawn(Piece):
 class Knight(Piece):
     """Knight class. Contains all the knight moves"""
 
-    def __init__(self, direction, position, representation):
+    def __init__(self, _, position, representation):
         moves = []
         super().__init__(moves, position, representation)
 
 class Bishop(Piece):
     """Bishop class. Contains all the bishop moves"""
 
-    def __init__(self, direction, position, representation):
+    def __init__(self, _, position, representation):
         moves = [move.BishopMove(8)]
         super().__init__(moves, position, representation)
 
 class Rook(Piece):
     """Rook class. Contains all the rook moves"""
 
-    def __init__(self, direction, position, representation):
+    def __init__(self, _, position, representation):
         moves = [move.RookMove()]
         super().__init__(moves, position, representation)
 
 class Queen(Piece):
     """Queen class. Contains all the queen moves"""
 
-    def __init__(self, direction, position, representation):
+    def __init__(self, _, position, representation):
         moves = [move.RookMove(), move.BishopMove(8)]
         super().__init__(moves, position, representation)
 
 class King(Queen):
     """King class. Contains all the king moves"""
 
-    def __init__(self, direction, position, representation):
-        super().__init__(direction, position, representation)
+    def __init__(self, _, position, representation):
+        super().__init__(_, position, representation)
         for move_ in self.moves:
             move_.range = 1
 

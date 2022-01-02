@@ -4,11 +4,11 @@ Created on Mon Feb  8 20:35:48 2021
 
 @author: Korean_Crimson
 """
-
 from typing import Tuple
 
-X_POSITIONS = {k: v for k, v in zip(range(8), 'abcdefgh')}
+X_POSITIONS = dict(zip(range(8), 'abcdefgh'))
 
+#pylint: disable=invalid-name
 def convert(position: Tuple[int, int]) -> str:
     """Converts an int index position on the board into a standard chess square name.
     Example: (0, 7) -> a1
