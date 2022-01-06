@@ -7,7 +7,6 @@ Created on Mon Feb  8 12:56:04 2021
 from dataclasses import dataclass
 from itertools import product
 from itertools import takewhile
-from typing import Iterator
 from typing import List
 from typing import Tuple
 
@@ -28,49 +27,62 @@ class Move:
     ) -> List[Tuple[int, int]]:
         """Computes all valid moves that can be made from the passed position"""
         x, y = position
-        horz_moves = []
-        vert_moves = []
-        if self.vert_move:
-            squares = [row[x] for row in board]
-            horz_moves = list(self._compute_valid_moves(y, x, squares, team))
+        return self._compute_horz_moves(x, y, board, team) + self._compute_vert_moves(x, y, board, team)
 
-        if self.horz_move:
-            squares = list(board)[y]
-            vert_moves = [
-                (x, y) for y, x in self._compute_valid_moves(x, y, squares, team)
-            ]
-        return horz_moves + vert_moves
+    def _compute_horz_moves(self, current_x, y, board, team):
+        if not self.horz_move:
+            return []
 
-    def _compute_valid_moves(
-        self, coord, other_coord, all_squares, team
-    ) -> Iterator[Tuple[int, int]]:
-        start = coord if self.forward_only else 0
-        end = start + self.range_ * self.direction
-        if start > end:
-            start, end = end, start
-        if self.direction == 1:
-            end += 1
-        if end > len(all_squares):
-            end = len(all_squares)
+        moves = []
 
-        squares = all_squares[start:end]
-        for y, square in enumerate(squares, start):
-            if y == coord:
-                continue
-
-            if square is None:
-                if self._check_squares_between(squares, y, coord):
-                    yield other_coord, y
-                    continue
+        #forward
+        for x in range(current_x + 1, board.size):
+            square = board[x, y]
+            if square is None or square.team != team:
+                moves.append((x, y))
+            if square is not None:
                 break
 
-            is_enemy = square.team != team
-            if (
-                self.can_capture
-                and is_enemy
-                and self._check_squares_between(squares, y, coord)
-            ):
-                yield other_coord, y
+        #backward
+        for x in range(current_x - 1, -1, -1):
+            square = board[x, y]
+            if square is None or square.team != team:
+                moves.append((x, y))
+            if square is not None:
+                break
+
+        return moves
+
+    def _compute_vert_moves(self, x, y, board, team):
+        current_y = y
+        if not self.vert_move:
+            return []
+
+        forward_moves = []
+        for y in range(current_y - 1, current_y - 1 - self.range_, -1):
+            if y < 0:
+                break
+
+            square = board[x, y]
+            if square is None or (square.team != team and self.can_capture):
+                forward_moves.append((x, y))
+            if square is not None:
+                break
+
+        backward_moves = []
+        for y in range(current_y + 1, current_y + 1 + self.range_):
+            if y >= board.size:
+                break
+
+            square = board[x, y]
+            if square is None or (square.team != team and self.can_capture):
+                backward_moves.append((x, y))
+            if square is not None:
+                break
+
+        if self.forward_only:
+            return forward_moves if self.direction == -1 else backward_moves
+        return forward_moves + backward_moves
 
     def _check_squares_between(self, squares, y, coord):
         end = y - 1 if self.can_capture else y
