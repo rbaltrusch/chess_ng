@@ -27,7 +27,9 @@ class Move:
     ) -> List[Tuple[int, int]]:
         """Computes all valid moves that can be made from the passed position"""
         x, y = position
-        return self._compute_horz_moves(x, y, board, team) + self._compute_vert_moves(x, y, board, team)
+        horz_moves = self._compute_horz_moves(x, y, board, team)
+        vert_moves = self._compute_vert_moves(x, y, board, team)
+        return horz_moves + vert_moves
 
     def _compute_horz_moves(self, current_x, y, board, team):
         if not self.horz_move:
@@ -53,8 +55,7 @@ class Move:
 
         return moves
 
-    def _compute_vert_moves(self, x, y, board, team):
-        current_y = y
+    def _compute_vert_moves(self, x, current_y, board, team):
         if not self.vert_move:
             return []
 
