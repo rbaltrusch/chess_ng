@@ -61,6 +61,18 @@ class Board:
         """Returns True if the checked position is None (contains no piece) else False"""
         return self[position] is None
 
+    def is_on_board(self, position: Tuple[int, int]) -> bool:
+        """Returns True if the checked position is on the board"""
+        #pylint: disable=invalid-name
+        x, y = position
+        return 0 <= x < self.size and 0 <= y < self.size
+
+    def is_enemy(self, position: Tuple[int, int], team: int) -> bool:
+        """Returns True if the checked position contains a piece with a team
+        that is not the one specified.
+        """
+        return self[position] is not None and self[position].team != team
+
     def capture_at(self, position: Tuple[int, int]) -> None:
         """Removes the piece at the passed position and marks it as captured"""
         if not self.is_empty_at(position):
