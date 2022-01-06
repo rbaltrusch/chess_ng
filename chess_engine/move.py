@@ -19,7 +19,6 @@ class Move:
     direction: int = 1
     forward_only: bool = False
     horz_move: bool = False
-    vert_move: bool = False
     can_capture: bool = False
 
     def compute_valid_moves(
@@ -56,9 +55,6 @@ class Move:
         return moves
 
     def _compute_vert_moves(self, x, current_y, board, team):
-        if not self.vert_move:
-            return []
-
         forward_moves = []
         for y in range(current_y - 1, current_y - 1 - self.range_, -1):
             if y < 0:
@@ -84,11 +80,6 @@ class Move:
         if self.forward_only:
             return forward_moves if self.direction == -1 else backward_moves
         return forward_moves + backward_moves
-
-    def _check_squares_between(self, squares, y, coord):
-        end = y - 1 if self.can_capture else y
-        squares_between = squares[y:coord] if y <= coord else squares[coord + 1 : end]
-        return all(square is None for square in squares_between)
 
 
 @dataclass
@@ -154,7 +145,7 @@ class InitialPawnMove(Move):
     def __init__(self, direction):
         range_ = 2
         super().__init__(
-            range_, direction, forward_only=True, vert_move=True, can_capture=False
+            range_, direction, forward_only=True, can_capture=False
         )
 
 
@@ -175,7 +166,7 @@ class PawnMove(Move):
     def __init__(self, direction):
         range_ = 1
         super().__init__(
-            range_, direction, forward_only=True, vert_move=True, can_capture=False
+            range_, direction, forward_only=True, can_capture=False
         )
 
 
@@ -196,7 +187,7 @@ class RookMove(Move):
 
     def __init__(self):
         range_ = 8
-        super().__init__(range_, horz_move=True, vert_move=True, can_capture=True)
+        super().__init__(range_, horz_move=True, can_capture=True)
 
 
 class KnightMove:
