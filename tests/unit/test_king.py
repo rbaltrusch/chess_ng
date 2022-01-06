@@ -6,6 +6,7 @@ Created on Sun Jan  2 23:03:05 2022
 """
 
 import pytest
+from chess_engine.util import convert
 from chess_engine.util import convert_str
 from chess_engine.board import Board
 from chess_engine.piece import King
@@ -28,7 +29,7 @@ def test_king(position, expected):
     board = Board(pieces=[piece], size=8)
 
     moves = piece.compute_valid_moves(board)
-    assert len(moves) == expected
+    assert len(list(map(convert, moves))) == expected
 
 @pytest.mark.parametrize("position, length, expected", [("a1", 8, True),
                                                         ("a2", 8, True),
@@ -47,5 +48,10 @@ def test_king_capture(position, length, expected):
     board = Board(pieces=[piece, piece2], size=8)
 
     moves = piece.compute_valid_moves(board)
-    assert len(moves) == length
+    assert len(list(map(convert, moves))) == length
     assert (convert_str(position) in moves) is expected
+
+if __name__ == '__main__':
+    import sys
+    sys.path.insert(1, '..')
+    test_king('a1', 3)
