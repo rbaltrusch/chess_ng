@@ -90,13 +90,12 @@ class Queen(Piece):
         moves = [move.RookMove(), move.BishopMove(8)]
         super().__init__(moves, position, representation)
 
-class King(Queen):
+class King(Piece):
     """King class. Contains all the king moves"""
 
     def __init__(self, _, position, representation):
-        super().__init__(_, position, representation)
-        for move_ in self.moves:
-            move_.range = 1
+        moves = [move.KingMove()]
+        super().__init__(moves, position, representation)
 
 PIECES = {PAWN: Pawn,
           KNIGHT: Knight,

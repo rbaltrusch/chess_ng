@@ -5,6 +5,7 @@ Created on Mon Feb  8 12:56:04 2021
 @author: Korean_Crimson
 """
 from dataclasses import dataclass
+from itertools import product
 from itertools import takewhile
 from typing import Iterator
 from typing import List
@@ -143,6 +144,17 @@ class InitialPawnMove(Move):
             range_, direction, forward_only=True, vert_move=True, can_capture=False
         )
 
+
+class KingMove:
+    """Moves 1 space in any direction"""
+
+    @staticmethod
+    def compute_valid_moves(position: Tuple[int, int], board, team: int) -> List[Tuple[int, int]]:
+        """Computes all valid moves that can be made from the passed position"""
+        neighbours = lambda x: [y for y in (x - 1, x, x + 1) if 0 <= y < board.size]
+        x, y = position
+        return [pos for pos in product(neighbours(x), neighbours(y))
+                if pos != position and (board[pos] is None or board[pos].team != team)]
 
 class PawnMove(Move):
     """Moves 1 space forward"""
