@@ -45,13 +45,16 @@ def test_bishop_capture(position, length, expected):
     assert len(moves) == length
     assert (convert_str(position) in moves) is expected
 
-def test_bishop_move_not_going_through_targets():
+@pytest.mark.parametrize("team,expected_moves", [(2, {'a1', 'a3', 'c3', 'c1'}),
+                                                 (1, set()),
+                                                 ])
+def test_bishop_move_not_going_through_targets(team, expected_moves):
     bishop = Bishop(None, convert_str("b2"), representation='L1')
-    piece2 = Pawn(direction=1, position=convert_str("a1"), representation='o2')
-    piece3 = Pawn(direction=1, position=convert_str("a3"), representation='o2')
-    piece4 = Pawn(direction=1, position=convert_str("c3"), representation='o2')
-    piece5 = Pawn(direction=1, position=convert_str("c1"), representation='o2')
+    piece2 = Pawn(direction=1, position=convert_str("a1"), representation=f'o{team}')
+    piece3 = Pawn(direction=1, position=convert_str("a3"), representation=f'o{team}')
+    piece4 = Pawn(direction=1, position=convert_str("c3"), representation=f'o{team}')
+    piece5 = Pawn(direction=1, position=convert_str("c1"), representation=f'o{team}')
     board = Board(pieces=[bishop, piece2, piece3, piece4, piece5], size=8)
 
     moves = bishop.compute_valid_moves(board)
-    assert set(map(convert, moves)) == {'a1', 'a3', 'c3', 'c1'}
+    assert set(map(convert, moves)) == expected_moves
