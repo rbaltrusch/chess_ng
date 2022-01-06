@@ -28,24 +28,33 @@ class Piece:
         self.team = representation[-1]
         self.captured = False
         self.position_history = []
+        self._valid_moves = {} #cached moves per board position
 
     def __repr__(self):
         return f'{self.__class__.__name__}({convert(self.position)})'
 
     def compute_valid_moves(self, board) -> List[Tuple[int, int]]:
         """Returns a list of squares that the piece can move to or capture at"""
+        if board in self._valid_moves:
+            return self._valid_moves[board]
+
         valid_squares = []
         for move_ in self.moves:
             valid_squares_ = move_.compute_valid_moves(self.position, board, self.team)
             valid_squares.extend(valid_squares_)
         return list(set(valid_squares))
 
-    def move_to(self, position) -> None:
+    def move_to(self, position, log=True) -> None:
         """Moves the piece to the specified position and adds it to the position history"""
         pos_old = convert(self.position)
-        print(f'{self.team}: {self.representation} from {pos_old} to {convert(position)}')
         self.position = position
         self.position_history.append(position)
+        if log:
+            print(f'{self.team}: {self.representation} from {pos_old} to {convert(position)}')
+
+    def can_move_to(self, board, position) -> bool:
+        """Returns true if this piece can move to the specified position"""
+        return position in self.compute_valid_moves(board)
 
 class Pawn(Piece):
     """Pawn class. Contains all the pawn moves"""
@@ -56,9 +65,9 @@ class Pawn(Piece):
                  move.PawnCapture(direction)]
         super().__init__(moves, position, representation)
 
-    def move_to(self, position):
+    def move_to(self, position, log=True):
         """Overrides Piece.move_to. Disables InitialPawnMove if the pawn has moved before"""
-        super().move_to(position)
+        super().move_to(position, log=log)
         if len(self.position_history) == 1:
             self.moves = [move_ for move_ in self.moves if not isinstance(move_, InitialPawnMove)]
 

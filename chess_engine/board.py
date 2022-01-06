@@ -7,6 +7,7 @@ Created on Mon Feb  8 15:19:32 2021
 import re
 from typing import List
 from typing import Tuple
+from typing import Union
 
 from colorama import Back
 from colorama import Fore
@@ -43,6 +44,9 @@ class Board:
             print()
         return ''
 
+    def __hash__(self):
+        return hash((frozenset(self.pieces.items()), self.size))
+
     def __iter__(self):
         #pylint: disable=invalid-name
         for y in range(self.size):
@@ -51,10 +55,13 @@ class Board:
     def __getitem__(self, value):
         return self.pieces.get(value)
 
-    def move_piece(self, piece: Piece, position: Tuple[int, int]) -> None:
+    def __setitem__(self, key, value):
+        self.pieces[key] = value
+
+    def move_piece(self, piece: Piece, position: Tuple[int, int], log=True) -> None:
         """Moves the passed piece from the current position to the passed position"""
         self.pieces.pop(piece.position)
-        piece.move_to(position)
+        piece.move_to(position, log=log)
         self.pieces[piece.position] = piece
 
     def is_empty_at(self, position: Tuple[int, int]) -> bool:
@@ -73,9 +80,12 @@ class Board:
         """
         return self[position] is not None and self[position].team != team
 
-    def capture_at(self, position: Tuple[int, int]) -> None:
+    def capture_at(self, position: Tuple[int, int], log=True) -> Union[None, Piece]:
         """Removes the piece at the passed position and marks it as captured"""
         if not self.is_empty_at(position):
             piece = self.pieces.pop(position)
             piece.captured = True
-            print(f'Captured {piece}')
+            if log:
+                print(f'Captured {piece}')
+            return piece
+        return None
