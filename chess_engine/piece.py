@@ -66,7 +66,7 @@ class Knight(Piece):
     """Knight class. Contains all the knight moves"""
 
     def __init__(self, _, position, representation):
-        moves = []
+        moves = [move.KnightMove()]
         super().__init__(moves, position, representation)
 
 class Bishop(Piece):

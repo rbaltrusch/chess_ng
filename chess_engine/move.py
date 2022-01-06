@@ -4,7 +4,6 @@ Created on Mon Feb  8 12:56:04 2021
 
 @author: Korean_Crimson
 """
-
 import itertools
 from dataclasses import dataclass
 from typing import List
@@ -192,3 +191,13 @@ class RookMove(Move):
 
 class KnightMove:
     """Knight move"""
+
+    @staticmethod
+    def compute_valid_moves(position: Tuple[int, int], board, team: int) -> List[Tuple[int, int]]:
+        """Computes all valid moves that can be made from the passed position"""
+        x1, y1 = position
+        indices = [(x, y) for x, y in itertools.product((1, 2, -1, -2), repeat=2)
+                   if abs(x) != abs(y)]
+        positions = [(x1 + x2, y1 + y2) for x2, y2 in indices]
+        return [pos for pos in positions if board.is_on_board(pos)
+                and (board.is_empty_at(pos) or board.is_enemy(pos, team))]
