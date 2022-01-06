@@ -4,9 +4,9 @@ Created on Mon Feb  8 12:56:04 2021
 
 @author: Korean_Crimson
 """
+
+import itertools
 from dataclasses import dataclass
-from itertools import product
-from itertools import takewhile
 from typing import List
 from typing import Tuple
 
@@ -117,7 +117,7 @@ class BishopMove:
         x, y = position
         end_x, x_step = (x - self.range_ - 1, -1) if min_x else (x + self.range_ + 1, 1)
         end_y, y_step = (y - self.range_ - 1, -1) if min_y else (y + self.range_ + 1, 1)
-        get_indices = lambda start, stop, step: takewhile(
+        get_indices = lambda start, stop, step: itertools.takewhile(
             lambda x: 0 <= x < 8, range(start, stop, step)
         )
         indices = list(
@@ -157,7 +157,7 @@ class KingMove:
         """Computes all valid moves that can be made from the passed position"""
         neighbours = lambda x: [y for y in (x - 1, x, x + 1) if 0 <= y < board.size]
         x, y = position
-        return [pos for pos in product(neighbours(x), neighbours(y))
+        return [pos for pos in itertools.product(neighbours(x), neighbours(y))
                 if pos != position and (board[pos] is None or board[pos].team != team)]
 
 class PawnMove(Move):
