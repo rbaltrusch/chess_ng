@@ -4,19 +4,11 @@
 
 # Chess Engine
 
-This is a small chess engine written in Python. It is currently still a work in progress.
+This is a small chess engine written in Python. It currently supports basic moves and captures for all chess pieces (this does not include en-passant and castling). The supported game endings are checkmate and stalemate.
 
-## Current features
+## Chess AI
 
-The engine currently supports basic moves and captures for all chess pieces (this does not include en-passant and castling).
-
-Currently, the game can end in:
-- checkmate (when the allied king is in check and there are no valid moves for his side)
-- stalemate (when the allied king is not in check, but there are no valid moves for his side).
-
-### AI 
-
-The game currently uses a simple [minimax](https://en.wikipedia.org/wiki/Minimax) algorithm with alpha-beta pruning. This works fairly well, and at recursion depth 4, the engien starts to make pretty sensible moves, like getting hold of the center, developing major pieces, forking pieces, controlling open and semi-open files with rooks, controlling more space by playing pawn a4 -> a5, etc...
+The game currently uses a simple [minimax](https://en.wikipedia.org/wiki/Minimax) algorithm with alpha-beta pruning to decide on its best move. This works fairly well, and at recursion depth 4, the engine starts to make pretty sensible moves, such as getting hold of the center, developing major pieces, forking pieces, controlling open and semi-open files with rooks, controlling more space by playing pawn a4 -> a5, etc...
 
 The AI is quite positionally minded, without any hard-coded square weights or similar methods. This is achieved by using a simple evaluation function in the minimax algorithm that rates the amount of legal moves the allied side can make, versus the moves of the enemy side:
 
