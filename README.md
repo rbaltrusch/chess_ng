@@ -18,6 +18,10 @@ len(team.compute_all_moves(board)) - len(enemy.compute_all_moves(board))
 
 This naturally encourages a lot of activity in the center and positional play, as well as rating pieces correctly depending on the game state (e.g. a blocked rook is worthless because it can make no moves, but a rook on a semi-open file controls a lot of space and is worth a lot), without the shortcomings of a hand-crafted or hard-coded approach.
 
+### Example game
+
+An example game of the chess AI playing against itself can be found [here](https://www.chess.com/analysis/game/pgn/4TbhVit3ki).
+
 ## Getting started
 
 To get a copy of this repository, simply open up git bash in an empty folder and use the command:
