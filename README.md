@@ -8,24 +8,23 @@ This is a small chess engine written in Python. It is currently still a work in 
 
 ## Current features
 
-The engine currently supports basic moves for all chess pieces, as well as capturing, both for pawns and major pieces (King, Queen, rook and bishop).
+The engine currently supports basic moves and captures for all chess pieces (this does not include en-passant and castling).
 
-## Missing features
+Currently, the game can end in:
+- checkmate (when the allied king is in check and there are no valid moves for his side)
+- stalemate (when the allied king is not in check, but there are no valid moves for his side).
 
-- The knight currently can neither move nor capture
-- Captures are bugged
-- En passant captures
-- Castling
+### AI 
 
-## Features planned down the line
+The game currently uses a simple [minimax](https://en.wikipedia.org/wiki/Minimax) algorithm with alpha-beta pruning. This works fairly well, and at recursion depth 4, the engien starts to make pretty sensible moves, like getting hold of the center, developing major pieces, forking pieces, controlling open and semi-open files with rooks, controlling more space by playing pawn a4 -> a5, etc...
 
-### Improved AI
+The AI is quite positionally minded, without any hard-coded square weights or similar methods. This is achieved by using a simple evaluation function in the minimax algorithm that rates the amount of legal moves the allied side can make, versus the moves of the enemy side:
 
-Currently, the AI just picks a random move each turn. This should be improved using a [minimax](https://en.wikipedia.org/wiki/Minimax) algorithm and weighted squares, with a priority on the centre of the chess board.
+```python
+len(team.compute_all_moves(board)) - len(enemy.compute_all_moves(board))
+```
 
-### Machine learning
-
-With weighted square parameters being given to improve the positional play of the AI, it seems to be a logical next step to improve the AI using machine learning by combining random parameter adjustments with a genetic algorithm.
+This naturally encourages a lot of activity in the center and positional play, as well as rating pieces correctly depending on the game state (e.g. a blocked rook is worthless because it can make no moves, but a rook on a semi-open file controls a lot of space and is worth a lot), without the shortcomings of a hand-crafted or hard-coded approach.
 
 ## Getting started
 
@@ -36,6 +35,10 @@ To get a copy of this repository, simply open up git bash in an empty folder and
 To install all python dependencies, run the following in your command line:
 
     python -m pip install -r requirements.txt
+
+## Next up: Machine learning ?
+
+With weighted square parameters being given to improve the positional play of the AI, it seems to be a logical next step to improve the AI using machine learning by combining random parameter adjustments with a genetic algorithm.
 
 ## Contributions
 
