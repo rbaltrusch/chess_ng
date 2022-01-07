@@ -64,6 +64,16 @@ class Board:
         piece.move_to(position, log=log)
         self.pieces[piece.position] = piece
 
+    def capture_at(self, position: Tuple[int, int], log=True) -> Union[None, Piece]:
+        """Removes the piece at the passed position and marks it as captured"""
+        if not self.is_empty_at(position):
+            piece = self.pieces.pop(position)
+            piece.captured = True
+            if log:
+                print(f'Captured {piece}')
+            return piece
+        return None
+
     def is_empty_at(self, position: Tuple[int, int]) -> bool:
         """Returns True if the checked position is None (contains no piece) else False"""
         return self[position] is None
@@ -79,13 +89,3 @@ class Board:
         that is not the one specified.
         """
         return self[position] is not None and self[position].team != team
-
-    def capture_at(self, position: Tuple[int, int], log=True) -> Union[None, Piece]:
-        """Removes the piece at the passed position and marks it as captured"""
-        if not self.is_empty_at(position):
-            piece = self.pieces.pop(position)
-            piece.captured = True
-            if log:
-                print(f'Captured {piece}')
-            return piece
-        return None
