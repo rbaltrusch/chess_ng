@@ -14,7 +14,6 @@ from chess_engine.consts import KNIGHT
 from chess_engine.consts import PAWN
 from chess_engine.consts import QUEEN
 from chess_engine.consts import ROOK
-from chess_engine.move import InitialPawnMove
 from chess_engine.util import convert
 from chess_engine.util import convert_str
 
@@ -40,7 +39,7 @@ class Piece:
 
         valid_squares = []
         for move_ in self.moves:
-            valid_squares_ = move_.compute_valid_moves(self.position, board, self.team)
+            valid_squares_ = move_.compute_valid_moves(board, self)
             valid_squares.extend(valid_squares_)
         return list(set(valid_squares))
 
@@ -64,12 +63,6 @@ class Pawn(Piece):
                  move.PawnMove(direction),
                  move.PawnCapture(direction)]
         super().__init__(moves, position, representation)
-
-    def move_to(self, position, log=True):
-        """Overrides Piece.move_to. Disables InitialPawnMove if the pawn has moved before"""
-        super().move_to(position, log=log)
-        if len(self.position_history) == 1:
-            self.moves = [move_ for move_ in self.moves if not isinstance(move_, InitialPawnMove)]
 
 class Knight(Piece):
     """Knight class. Contains all the knight moves"""

@@ -20,13 +20,11 @@ class Move:
     horz_move: bool = False
     can_capture: bool = False
 
-    def compute_valid_moves(
-        self, position: Tuple[int, int], board, team: int
-    ) -> List[Tuple[int, int]]:
+    def compute_valid_moves(self, board, piece) -> List[Tuple[int, int]]:
         """Computes all valid moves that can be made from the passed position"""
-        x, y = position
-        horz_moves = self._compute_horz_moves(x, y, board, team)
-        vert_moves = self._compute_vert_moves(x, y, board, team)
+        x, y = piece.position
+        horz_moves = self._compute_horz_moves(x, y, board, piece.team)
+        vert_moves = self._compute_vert_moves(x, y, board, piece.team)
         return horz_moves + vert_moves
 
     def _compute_horz_moves(self, current_x, y, board, team):
@@ -90,10 +88,11 @@ class BishopMove:
     forward_only: bool = False
     must_capture: bool = False
 
-    def compute_valid_moves(
-        self, position: Tuple[int, int], board, team: int
-    ) -> List[Tuple[int, int]]:
+    def compute_valid_moves(self, board, piece) -> List[Tuple[int, int]]:
         """Computes all valid moves that can be made from the passed position"""
+        position = piece.position
+        team = piece.team
+
         generators_forward = [
             self._compute_valid_moves(position, board, team, min_x=False, min_y=True),
             self._compute_valid_moves(position, board, team, min_x=True, min_y=True),
@@ -147,17 +146,22 @@ class InitialPawnMove(Move):
             range_, direction, forward_only=True, can_capture=False
         )
 
+    def compute_valid_moves(self, board, piece) -> List[Tuple[int, int]]:
+        if len(piece.position_history):
+            return []
+        return super().compute_valid_moves(board, piece)
 
 class KingMove:
     """Moves 1 space in any direction"""
 
     @staticmethod
-    def compute_valid_moves(position: Tuple[int, int], board, team: int) -> List[Tuple[int, int]]:
+    def compute_valid_moves(board, piece) -> List[Tuple[int, int]]:
         """Computes all valid moves that can be made from the passed position"""
         neighbours = lambda x: [y for y in (x - 1, x, x + 1) if 0 <= y < board.size]
-        x, y = position
+        x, y = piece.position
         return [pos for pos in itertools.product(neighbours(x), neighbours(y))
-                if pos != position and (board[pos] is None or board[pos].team != team)]
+                if pos != piece.position
+                and (board[pos] is None or board[pos].team != piece.team)]
 
 class PawnMove(Move):
     """Moves 1 space forward"""
@@ -193,11 +197,11 @@ class KnightMove:
     """Knight move"""
 
     @staticmethod
-    def compute_valid_moves(position: Tuple[int, int], board, team: int) -> List[Tuple[int, int]]:
+    def compute_valid_moves(board, piece) -> List[Tuple[int, int]]:
         """Computes all valid moves that can be made from the passed position"""
-        x1, y1 = position
+        x1, y1 = piece.position
         indices = [(x, y) for x, y in itertools.product((1, 2, -1, -2), repeat=2)
                    if abs(x) != abs(y)]
         positions = [(x1 + x2, y1 + y2) for x2, y2 in indices]
         return [pos for pos in positions if board.is_on_board(pos)
-                and (board.is_empty_at(pos) or board.is_enemy(pos, team))]
+                and (board.is_empty_at(pos) or board.is_enemy(pos, piece.team))]
