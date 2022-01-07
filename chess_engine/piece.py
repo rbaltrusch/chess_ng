@@ -32,6 +32,9 @@ class Piece:
     def __repr__(self):
         return f'{self.__class__.__name__}({convert(self.position)})'
 
+    def __hash__(self):
+        return hash((self.position, self.representation))
+
     def compute_valid_moves(self, board) -> List[Tuple[int, int]]:
         """Returns a list of squares that the piece can move to or capture at"""
         if board in self._valid_moves:
