@@ -58,6 +58,16 @@ class Board:
     def __setitem__(self, key, value):
         self.pieces[key] = value
 
+    def move_piece_and_capture(self, position, piece, enemy_pieces, log=True):
+        """Moves piece to position on the board. Captures enemy if there is one"""
+        captured_piece = None
+        if not self.is_empty_at(position):
+            if self[position] in enemy_pieces:
+                captured_piece = self.capture_at(position, log=log)
+                enemy_pieces.remove(captured_piece)
+        self.move_piece(piece, position, log=log)
+        return captured_piece
+
     def move_piece(self, piece: Piece, position: Tuple[int, int], log=True) -> None:
         """Moves the passed piece from the current position to the passed position"""
         self.pieces.pop(piece.position)

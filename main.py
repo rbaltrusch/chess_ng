@@ -36,28 +36,18 @@ def get_valid_squares(board, pieces):
     """Returns all valid moves for all pieces passed in"""
     return [(piece, s) for piece in pieces for s in piece.compute_valid_moves(board)]
 
-def move_piece(board, position, piece, enemy_pieces, log=True):
-    """Moves piece to position on the board. Captures enemy if there is one"""
-    captured_piece = None
-    if not board.is_empty_at(position):
-        if board[position] in enemy_pieces:
-            captured_piece = board.capture_at(position, log=log)
-            enemy_pieces.remove(captured_piece)
-    board.move_piece(piece, position, log=log)
-    return captured_piece
-
 def filter_king_check_moves(board, moves, king, enemy_pieces):
     """Returns moves not resulting in a check of the allied king"""
     valid_moves = []
     for piece, position in moves:
         original_position = piece.position
-        captured_piece = move_piece(board, position, piece, enemy_pieces, log=False)
+        captured_piece = board.move_piece_and_capture(position, piece, enemy_pieces, log=False)
 
         if not in_check(board, king, enemy_pieces):
             valid_moves.append((piece, position))
 
         #undo move
-        move_piece(board, original_position, piece, enemy_pieces, log=False)
+        board.move_piece_and_capture(original_position, piece, enemy_pieces, log=False)
         piece.position_history.pop()
         piece.position_history.pop()
         board[position] = captured_piece
@@ -94,12 +84,12 @@ def minimax(board, pieces, team, enemy, depth, alpha, beta, maximizing_player):
         random.shuffle(moves) #HACK to avoid the same game consistently
         for piece, position in moves:
             original_position = piece.position
-            captured_piece = move_piece(board, position, piece, pieces[enemy], log=False)
+            captured_piece = board.move_piece_and_capture(position, piece, pieces[enemy], log=False)
 
             eval_position = minimax(board, pieces, team, enemy, depth-1, alpha, beta, False)[0]
 
             #undo move
-            move_piece(board, original_position, piece, pieces[enemy], log=False)
+            board.move_piece_and_capture(original_position, piece, pieces[enemy], log=False)
             piece.position_history.pop()
             piece.position_history.pop()
             board[position] = captured_piece
@@ -124,12 +114,12 @@ def minimax(board, pieces, team, enemy, depth, alpha, beta, maximizing_player):
     best_min_move = None
     for piece, position in moves:
         original_position = piece.position
-        captured_piece = move_piece(board, position, piece, pieces[team], log=False)
+        captured_piece = board.move_piece_and_capture(position, piece, pieces[team], log=False)
 
         eval_position = minimax(board, pieces, team, enemy, depth-1, alpha, beta, True)[0]
 
         #undo move
-        move_piece(board, original_position, piece, pieces[team], log=False)
+        board.move_piece_and_capture(original_position, piece, pieces[team], log=False)
         piece.position_history.pop()
         piece.position_history.pop()
         board[position] = captured_piece
@@ -183,7 +173,7 @@ def main():
                 alpha=-math.inf, beta=math.inf, maximizing_player=True
             )
             print(f'Rating: {rating}')
-            move_piece(board, position, piece, enemy_pieces)
+            board.move_piece_and_capture(position, piece, enemy_pieces)
 
             #check if checking enemy king
             enemy_king = [x for x in enemy_pieces if isinstance(x, King)][0]
