@@ -22,6 +22,8 @@ This naturally encourages a lot of activity in the center and positional play, a
 
 An example game of the chess AI playing against itself can be found [here](https://www.chess.com/analysis/game/pgn/4TbhVit3ki).
 
+![Chess artificial intelligence playing a game](media/chess_ai.gif?raw=true "Chess artificial intelligence playing a game")
+
 ## Getting started
 
 To get a copy of this repository, simply open up git bash in an empty folder and use the command:
