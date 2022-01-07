@@ -5,9 +5,7 @@ Created on Mon Feb  8 13:36:04 2021
 @author: Korean_Crimson
 """
 import math
-import random
-from typing import Dict
-from typing import List
+from typing import Tuple
 
 from chess_engine.algorithm import ReversibleMove
 from chess_engine.board import Board
@@ -15,11 +13,10 @@ from chess_engine.consts import BLACK
 from chess_engine.consts import BOARD
 from chess_engine.consts import DIRECTIONS
 from chess_engine.consts import WHITE
-from chess_engine.piece import King
-from chess_engine.piece import Piece
 from chess_engine.piece import PIECES
+from chess_engine.team import Team
 
-def init_pieces() -> Dict[int, List[Piece]]:
+def init_pieces() -> Tuple[Team, Team]:
     """Initialises white and black pieces and returns them in a dict"""
     #pylint: disable=invalid-name
     pieces = {WHITE: [], BLACK: []}
@@ -31,50 +28,30 @@ def init_pieces() -> Dict[int, List[Piece]]:
                 direction = DIRECTIONS[team]
                 new_piece = piece_class(direction, position=(x, y), representation=square)
                 pieces[team].append(new_piece)
-    return pieces
+    return Team(pieces[WHITE]), Team(pieces[BLACK])
 
-def get_valid_squares(board, pieces):
-    """Returns all valid moves for all pieces passed in"""
-    return [(piece, s) for piece in pieces for s in piece.compute_valid_moves(board)]
-
-def filter_king_check_moves(board, moves, king, enemy_pieces):
-    """Returns moves not resulting in a check of the allied king"""
-    valid_moves = []
-    for piece, position in moves:
-        with ReversibleMove(board, piece, position, enemy_pieces):
-            if not in_check(board, king, enemy_pieces):
-                valid_moves.append((piece, position))
-    return valid_moves
-
-def in_check(board, king, enemy_pieces) -> bool:
-    """Returns True if any enemy pieces can capture at the specified position"""
-    return any(x.can_move_to(board, king.position) for x in enemy_pieces)
-
-def evaluate(board, pieces, enemy_pieces):
+def evaluate(board, team, enemy):
     """Evaluates the board state based on the amount of moves allied pieces
     and enemy pieces can make.
     """
-    return len(get_valid_squares(board, pieces)) - len(get_valid_squares(board, enemy_pieces))
+    #HACK: using compute_all_moves instead of compute_valid_moves to save computation time
+    return len(team.compute_all_moves(board)) - len(enemy.compute_all_moves(board))
 
 #pylint: disable=too-many-arguments,too-many-locals #for now...
-def minimax(board, pieces, team, enemy, depth, alpha, beta, maximizing_player):
+def minimax(board, team, enemy, depth, alpha, beta, maximizing_player):
     """Minimax algorithm with alpha-beta pruning.
     At depth=3, computation speed is still relatively fast.
     At depth=4, it slows down considerably, but does make much better moves.
     """
-    best_move = None
     if depth == 0: #or game over
-        return evaluate(board, pieces[team], pieces[enemy]), best_move
+        return evaluate(board, team, enemy), None
 
     if maximizing_player:
+        best_move = None
         max_eval = -math.inf
-        king = [x for x in pieces[team] if isinstance(x, King)][0]
-        unfiltered_moves = get_valid_squares(board, pieces[team])
-        moves = filter_king_check_moves(board, unfiltered_moves, king, pieces[enemy])
-        random.shuffle(moves) #HACK to avoid the same game consistently
-        for piece, position in moves:
-            with ReversibleMove(board, piece, position, pieces[enemy]):
-                eval_position = minimax(board, pieces, team, enemy, depth-1, alpha, beta, False)[0]
+        for piece, position in team.compute_valid_moves(board, enemy.pieces):
+            with ReversibleMove(board, piece, position, enemy.pieces):
+                eval_position = minimax(board, team, enemy, depth-1, alpha, beta, False)[0]
 
             if eval_position > max_eval or best_move is None:
                 best_move = (piece, position)
@@ -86,14 +63,10 @@ def minimax(board, pieces, team, enemy, depth, alpha, beta, maximizing_player):
 
     min_evaluation = math.inf
     min_move = math.inf
-    king = [x for x in pieces[enemy] if isinstance(x, King)][0]
-    unfiltered_moves = get_valid_squares(board, pieces[enemy])
-    moves = filter_king_check_moves(board, unfiltered_moves, king, pieces[team])
-    random.shuffle(moves) #HACK to avoid the same game consistently
     best_min_move = None
-    for piece, position in moves:
-        with ReversibleMove(board, piece, position, pieces[enemy]):
-            eval_position = minimax(board, pieces, team, enemy, depth-1, alpha, beta, True)[0]
+    for piece, position in enemy.compute_valid_moves(board, team.pieces):
+        with ReversibleMove(board, piece, position, team.pieces):
+            eval_position = minimax(board, team, enemy, depth-1, alpha, beta, True)[0]
 
         min_evaluation = min(min_evaluation, eval_position)
         if min_evaluation < min_move:
@@ -111,22 +84,15 @@ def minimax(board, pieces, team, enemy, depth, alpha, beta, maximizing_player):
 
 def main():
     """Main function"""
-
-    pieces = init_pieces()
-    board = Board(pieces[WHITE] + pieces[BLACK], size=8)
+    teams = init_pieces()
+    board = Board([piece for team in teams for piece in team], size=8)
 
     for _ in range(50):
-        for team in [WHITE, BLACK]:
-            king = [x for x in pieces[team] if isinstance(x, King)][0]
-            enemy = BLACK if team is WHITE else WHITE
-            enemy_pieces = pieces[enemy]
-            is_in_check = in_check(board, king, enemy_pieces)
+        for team, enemy in [teams, teams[::-1]]:
+            is_in_check = team.in_check(board, enemy.pieces)
+            moves = team.compute_valid_moves(board, enemy.pieces)
 
-            moves = get_valid_squares(board, pieces[team])
-            valid_moves = filter_king_check_moves(board, moves, king, enemy_pieces)
-            random.shuffle(valid_moves) #HACK: avoid infinite repeat
-
-            if not valid_moves:
+            if not moves:
                 if is_in_check:
                     print(f'Checkmated team {team}. Team {enemy} wins.')
                 else:
@@ -137,15 +103,13 @@ def main():
                 print('Moving out of check.')
 
             rating, (piece, position) = minimax(
-                board, pieces, team, enemy, depth=4,
+                board, team, enemy, depth=4,
                 alpha=-math.inf, beta=math.inf, maximizing_player=True
             )
             print(f'Rating: {rating}')
-            board.move_piece_and_capture(position, piece, enemy_pieces)
+            board.move_piece_and_capture(position, piece, enemy.pieces)
 
-            #check if checking enemy king
-            enemy_king = [x for x in enemy_pieces if isinstance(x, King)][0]
-            if in_check(board, enemy_king, pieces[team]):
+            if enemy.in_check(board, team.pieces):
                 print('Checking enemy king')
 
             print(board)
