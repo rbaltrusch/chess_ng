@@ -9,6 +9,7 @@ import random
 from typing import Dict
 from typing import List
 
+from chess_engine.algorithm import ReversibleMove
 from chess_engine.board import Board
 from chess_engine.consts import BLACK
 from chess_engine.consts import BOARD
@@ -40,20 +41,9 @@ def filter_king_check_moves(board, moves, king, enemy_pieces):
     """Returns moves not resulting in a check of the allied king"""
     valid_moves = []
     for piece, position in moves:
-        original_position = piece.position
-        captured_piece = board.move_piece_and_capture(position, piece, enemy_pieces, log=False)
-
-        if not in_check(board, king, enemy_pieces):
-            valid_moves.append((piece, position))
-
-        #undo move
-        board.move_piece_and_capture(original_position, piece, enemy_pieces, log=False)
-        piece.position_history.pop()
-        piece.position_history.pop()
-        board[position] = captured_piece
-        if captured_piece is not None:
-            captured_piece.captured = False
-            enemy_pieces.append(captured_piece)
+        with ReversibleMove(board, piece, position, enemy_pieces):
+            if not in_check(board, king, enemy_pieces):
+                valid_moves.append((piece, position))
     return valid_moves
 
 def in_check(board, king, enemy_pieces) -> bool:
@@ -66,7 +56,7 @@ def evaluate(board, pieces, enemy_pieces):
     """
     return len(get_valid_squares(board, pieces)) - len(get_valid_squares(board, enemy_pieces))
 
-#pylint: disable=too-many-arguments,too-many-locals,too-many-statements #for now...
+#pylint: disable=too-many-arguments,too-many-locals #for now...
 def minimax(board, pieces, team, enemy, depth, alpha, beta, maximizing_player):
     """Minimax algorithm with alpha-beta pruning.
     At depth=3, computation speed is still relatively fast.
@@ -83,19 +73,8 @@ def minimax(board, pieces, team, enemy, depth, alpha, beta, maximizing_player):
         moves = filter_king_check_moves(board, unfiltered_moves, king, pieces[enemy])
         random.shuffle(moves) #HACK to avoid the same game consistently
         for piece, position in moves:
-            original_position = piece.position
-            captured_piece = board.move_piece_and_capture(position, piece, pieces[enemy], log=False)
-
-            eval_position = minimax(board, pieces, team, enemy, depth-1, alpha, beta, False)[0]
-
-            #undo move
-            board.move_piece_and_capture(original_position, piece, pieces[enemy], log=False)
-            piece.position_history.pop()
-            piece.position_history.pop()
-            board[position] = captured_piece
-            if captured_piece is not None:
-                captured_piece.captured = False
-                pieces[enemy].append(captured_piece)
+            with ReversibleMove(board, piece, position, pieces[enemy]):
+                eval_position = minimax(board, pieces, team, enemy, depth-1, alpha, beta, False)[0]
 
             if eval_position > max_eval or best_move is None:
                 best_move = (piece, position)
@@ -113,19 +92,8 @@ def minimax(board, pieces, team, enemy, depth, alpha, beta, maximizing_player):
     random.shuffle(moves) #HACK to avoid the same game consistently
     best_min_move = None
     for piece, position in moves:
-        original_position = piece.position
-        captured_piece = board.move_piece_and_capture(position, piece, pieces[team], log=False)
-
-        eval_position = minimax(board, pieces, team, enemy, depth-1, alpha, beta, True)[0]
-
-        #undo move
-        board.move_piece_and_capture(original_position, piece, pieces[team], log=False)
-        piece.position_history.pop()
-        piece.position_history.pop()
-        board[position] = captured_piece
-        if captured_piece is not None:
-            captured_piece.captured = False
-            pieces[team].append(captured_piece)
+        with ReversibleMove(board, piece, position, pieces[enemy]):
+            eval_position = minimax(board, pieces, team, enemy, depth-1, alpha, beta, True)[0]
 
         min_evaluation = min(min_evaluation, eval_position)
         if min_evaluation < min_move:
