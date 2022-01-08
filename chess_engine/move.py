@@ -90,51 +90,19 @@ class BishopMove:
 
     def compute_valid_moves(self, board, piece) -> List[Tuple[int, int]]:
         """Computes all valid moves that can be made from the passed position"""
-        position = piece.position
+        moves = []
+        x, y = piece.position
         team = piece.team
-
-        generators_forward = [
-            self._compute_valid_moves(position, board, team, min_x=False, min_y=True),
-            self._compute_valid_moves(position, board, team, min_x=True, min_y=True),
-        ]
-        generators_backward = [
-            self._compute_valid_moves(position, board, team, min_x=True, min_y=False),
-            self._compute_valid_moves(position, board, team, min_x=False, min_y=False),
-        ]
-        if self.forward_only:
-            generators = (
-                generators_forward if self.direction == -1 else generators_backward
-            )
-        else:
-            generators = generators_forward + generators_backward
-        squares = [square for generator in generators for square in generator]
-        return squares
-
-    # pylint: disable=too-many-arguments,too-many-locals
-    def _compute_valid_moves(self, position, board, team, min_x=False, min_y=False):
-        x, y = position
-        end_x, x_step = (x - self.range_ - 1, -1) if min_x else (x + self.range_ + 1, 1)
-        end_y, y_step = (y - self.range_ - 1, -1) if min_y else (y + self.range_ + 1, 1)
-        get_indices = lambda start, stop, step: itertools.takewhile(
-            lambda x: 0 <= x < 8, range(start, stop, step)
-        )
-        indices = list(
-            zip(get_indices(x, end_x, x_step), get_indices(y, end_y, y_step))
-        )
-        squares = [board[x, y] for x, y in indices]
-
-        for pos, square in zip(indices, squares):
-            if pos == position:
-                continue
-
-            if square is None:
-                if not self.must_capture:
-                    yield pos
-            else:
-                if square.team != team:
-                    yield pos
-                break
-
+        for x_dir, y_dir in itertools.product((1, -1), repeat=2):
+            pos = (x + x_dir, y + y_dir)
+            while board.is_on_board(pos):
+                square = board[pos]
+                if square is None or square.team != team:
+                    moves.append(pos)
+                if square is not None:
+                    break
+                pos = (pos[0] + x_dir, pos[1] + y_dir)
+        return moves
 
 # pylint: disable=too-few-public-methods
 class InitialPawnMove(Move):
