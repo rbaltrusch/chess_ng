@@ -5,6 +5,7 @@ Created on Mon Feb  8 15:19:32 2021
 @author: Korean_Crimson
 """
 import re
+import itertools
 from typing import List
 from typing import Tuple
 from typing import Union
@@ -20,6 +21,8 @@ class Board:
 
     def __init__(self, pieces: List[Piece], size: int):
         self._pieces = {piece.position: piece for piece in pieces}
+        self._squares = {pos: self._pieces.get(pos) for pos in
+                         itertools.product(range(size), repeat=2)}
         self.size = size
 
     def __repr__(self):
@@ -53,10 +56,11 @@ class Board:
             yield [self[x, y] for x in range(self.size)]
 
     def __getitem__(self, value):
-        return self._pieces.get(value)
+        return self._squares.get(value)
 
     def __setitem__(self, key, value):
         self._pieces[key] = value
+        self._squares[key] = value
 
     def move_piece_and_capture(self, position, piece, enemy_pieces, log=True):
         """Moves piece to position on the board. Captures enemy if there is one"""
@@ -71,13 +75,16 @@ class Board:
     def move_piece(self, piece: Piece, position: Tuple[int, int], log=True) -> None:
         """Moves the passed piece from the current position to the passed position"""
         self._pieces.pop(piece.position)
+        self._squares[piece.position] = None
         piece.move_to(position, log=log)
         self._pieces[piece.position] = piece
+        self._squares[piece.position] = piece
 
     def capture_at(self, position: Tuple[int, int], log=True) -> Union[None, Piece]:
         """Removes the piece at the passed position and marks it as captured"""
         if not self.is_empty_at(position):
             piece = self._pieces.pop(position)
+            self._squares[position] = None
             piece.captured = True
             if log:
                 print(f'Captured {piece}')
