@@ -3,3 +3,6 @@
 tests/reports/
 **/htmlcov/
 **/.coverage
+
+#profiler
+**/*.Result
