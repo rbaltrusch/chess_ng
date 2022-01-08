@@ -4,8 +4,8 @@ Created on Mon Feb  8 15:19:32 2021
 
 @author: Korean_Crimson
 """
-import re
 import itertools
+import re
 from typing import List
 from typing import Tuple
 from typing import Union
@@ -24,6 +24,7 @@ class Board:
         self._squares = {pos: self._pieces.get(pos) for pos in
                          itertools.product(range(size), repeat=2)}
         self.size = size
+        self.hash_cache: List[int] = []
 
     def __repr__(self):
         #pylint: disable=invalid-name
@@ -47,8 +48,16 @@ class Board:
             print()
         return ''
 
+    def __str__(self):
+        return ''.join(p.__str__() for p in self._pieces.values())
+
     def __hash__(self):
-        return hash((frozenset(self.pieces.items()), self.size))
+        if self.hash_cache:
+            return self.hash_cache[-1]
+        return self._compute_new_hash()
+
+    def _compute_new_hash(self):
+        return hash(str(self))
 
     def __iter__(self):
         #pylint: disable=invalid-name
@@ -57,6 +66,12 @@ class Board:
 
     def __getitem__(self, value):
         return self._squares.get(value)
+
+    def get_hash(self):
+        """Returns cached board hash if available, else returns None"""
+        if self.hash_cache:
+            return self.hash_cache[-1]
+        return None
 
     def __setitem__(self, key, value):
         self._pieces[key] = value
@@ -70,6 +85,7 @@ class Board:
                 captured_piece = self.capture_at(position, log=log)
                 enemy_pieces.remove(captured_piece)
         self.move_piece(piece, position, log=log)
+        self.hash_cache.append(self._compute_new_hash())
         return captured_piece
 
     def move_piece(self, piece: Piece, position: Tuple[int, int], log=True) -> None:

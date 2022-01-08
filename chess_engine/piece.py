@@ -22,6 +22,7 @@ class Piece:
 
     def __init__(self, moves, position, representation):
         self.moves = moves
+        self.string_position = position if isinstance(position, str) else convert(position)
         self.position = convert_str(position) if isinstance(position, str) else position
         self.representation = representation
         self.team = representation[-1]
@@ -32,18 +33,26 @@ class Piece:
     def __repr__(self):
         return f'{self.__class__.__name__}({convert(self.position)})'
 
+    def __str__(self):
+        return self.representation + self.string_position
+
     def __hash__(self):
         return hash((self.position, self.representation))
 
     def compute_valid_moves(self, board) -> List[Tuple[int, int]]:
         """Returns a list of squares that the piece can move to or capture at"""
-        if board in self._valid_moves:
+        if board.get_hash() in self._valid_moves:
             return self._valid_moves[board]
-        return list({pos for move in self.moves for pos in move.compute_valid_moves(board, self)})
+
+        moves = list({pos for move in self.moves
+                      for pos in move.compute_valid_moves(board, self)})
+        self._valid_moves[board] = moves
+        return moves
 
     def move_to(self, position, log=True) -> None:
         """Moves the piece to the specified position and adds it to the position history"""
-        pos_old = convert(self.position)
+        pos_old = self.position
+        self.string_position = convert(position)
         self.position = position
         self.position_history.append(position)
         if log:

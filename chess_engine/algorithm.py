@@ -41,6 +41,7 @@ class ReversibleMove:
         self.piece.position_history.pop()
         self.piece.position_history.pop()
         self.board[self.position] = self.captured_piece
+        self.board.hash_cache.pop()
         if self.captured_piece is not None:
             self.captured_piece.captured = False
             self.enemy_pieces.append(self.captured_piece)
