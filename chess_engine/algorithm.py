@@ -73,6 +73,8 @@ def minimax(board, team, enemy, depth, alpha, beta, maximizing_player):
                 best_move = (piece, position)
             max_eval = max(max_eval, eval_position)
             alpha = max(alpha, eval_position)
+            if eval_position >= beta:
+                break
             if beta <= alpha:
                 break
         return max_eval, best_move
@@ -92,6 +94,8 @@ def minimax(board, team, enemy, depth, alpha, beta, maximizing_player):
             best_min_move = (piece, position)
 
         beta = min(beta, eval_position)
+        if eval_position <= alpha:
+            break
         if beta <= alpha:
             break
 
