@@ -173,13 +173,17 @@ class PawnMove(Move):
         )
 
 
-class PawnCapture(BishopMove):
+class PawnCapture:
     """Moves 1 space forward diagonally and needs to capture"""
 
     def __init__(self, direction):
-        range_ = 1
-        super().__init__(range_, direction, forward_only=True, must_capture=True)
+        self.direction = direction
 
+    def compute_valid_moves(self, board, piece) -> List[Tuple[int, int]]:
+        x, y = piece.position
+        moves = ((x + 1, y + self.direction), (x - 1, y + self.direction))
+        return [x for x in filter(board.is_on_board, moves)
+                if not board.is_empty_at(x) and board.is_enemy(x, piece.team)]
 
 class EnPassantMove:
     """Pawn capture but with a pawn that already passed"""
