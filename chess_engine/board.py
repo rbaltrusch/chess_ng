@@ -4,8 +4,8 @@ Created on Mon Feb  8 15:19:32 2021
 
 @author: Korean_Crimson
 """
-import re
 import itertools
+import re
 from typing import List
 from typing import Tuple
 from typing import Union
@@ -46,9 +46,6 @@ class Board:
                 print(background + foreground + square, end='')
             print()
         return ''
-
-    def __hash__(self):
-        return hash((frozenset(self.pieces.items()), self.size))
 
     def __iter__(self):
         #pylint: disable=invalid-name

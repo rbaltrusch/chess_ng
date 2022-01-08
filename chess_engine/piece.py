@@ -27,7 +27,6 @@ class Piece:
         self.team = representation[-1]
         self.captured = False
         self.position_history = []
-        self._valid_moves = {} #cached moves per board position
 
     def __repr__(self):
         return f'{self.__class__.__name__}({convert(self.position)})'
@@ -37,8 +36,6 @@ class Piece:
 
     def compute_valid_moves(self, board) -> List[Tuple[int, int]]:
         """Returns a list of squares that the piece can move to or capture at"""
-        if board in self._valid_moves:
-            return self._valid_moves[board]
         return list({pos for move in self.moves for pos in move.compute_valid_moves(board, self)})
 
     def move_to(self, position, log=True) -> None:
