@@ -11,7 +11,7 @@ from typing import Tuple
 
 # pylint: disable=invalid-name
 @dataclass
-class Move:
+class LineMove:
     """Move class. Encapsulates how a piece moves. To be inherited from when implementing a move"""
 
     range_: int
@@ -99,7 +99,7 @@ class BishopMove:
                 pos = (pos[0] + x_dir, pos[1] + y_dir)
         return moves
 
-class InitialPawnMove(Move):
+class InitialPawnMove(LineMove):
     """Moves 2 spaces forward"""
 
     def __init__(self, direction):
@@ -125,7 +125,7 @@ class KingMove:
                 if pos != piece.position
                 and (board[pos] is None or board[pos].team != piece.team)]
 
-class PawnMove(Move):
+class PawnMove(LineMove):
     """Moves 1 space forward"""
 
     def __init__(self, direction):
@@ -152,7 +152,7 @@ class EnPassantMove:
     """Pawn capture but with a pawn that already passed"""
 
 
-class RookMove(Move):
+class RookMove(LineMove):
     """Moves horizontally or vertically for up to 8 spaces"""
 
     def __init__(self):
