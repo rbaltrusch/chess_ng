@@ -41,9 +41,6 @@ class Team:
                 if not self.in_check(board, enemy_pieces):
                     valid_moves.append((piece, move))
         random.shuffle(valid_moves) #HACK to avoid the same game consistently
-
-        #move captures to beginning of list
-        valid_moves.sort(key=lambda x: x[1].can_capture, reverse=True)
         return valid_moves
 
     def in_check(self, board, enemy_pieces) -> bool:

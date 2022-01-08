@@ -7,7 +7,6 @@ Created on Mon Feb  8 13:33:57 2021
 import logging
 import math
 from typing import List
-from typing import Tuple
 
 from chess_engine import move
 from chess_engine.consts import BISHOP
@@ -18,6 +17,8 @@ from chess_engine.consts import QUEEN
 from chess_engine.consts import ROOK
 from chess_engine.util import convert
 from chess_engine.util import convert_str
+
+from .move import Move
 
 TURN_COUNTER = 0.0
 
@@ -38,7 +39,7 @@ class Piece:
     def __hash__(self):
         return hash((self.position, self.representation))
 
-    def compute_valid_moves(self, board) -> List[Tuple[int, int]]:
+    def compute_valid_moves(self, board) -> List[Move]:
         """Returns a list of squares that the piece can move to or capture at"""
         return list({pos for move in self.moves for pos in move.compute_valid_moves(board, self)})
 
