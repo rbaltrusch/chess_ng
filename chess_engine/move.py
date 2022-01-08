@@ -163,12 +163,13 @@ class RookMove(Move):
 class KnightMove:
     """Knight move"""
 
-    @staticmethod
-    def compute_valid_moves(board, piece) -> List[Tuple[int, int]]:
+    INDICES = [(x, y) for x, y in itertools.product((1, 2, -1, -2), repeat=2)
+                   if abs(x) != abs(y)]
+
+    @classmethod
+    def compute_valid_moves(cls, board, piece) -> List[Tuple[int, int]]:
         """Computes all valid moves that can be made from the passed position"""
         x1, y1 = piece.position
-        indices = [(x, y) for x, y in itertools.product((1, 2, -1, -2), repeat=2)
-                   if abs(x) != abs(y)]
-        positions = [(x1 + x2, y1 + y2) for x2, y2 in indices]
+        positions = [(x1 + x2, y1 + y2) for x2, y2 in cls.INDICES]
         return [pos for pos in positions if board.is_on_board(pos)
                 and (board.is_empty_at(pos) or board.is_enemy(pos, piece.team))]
