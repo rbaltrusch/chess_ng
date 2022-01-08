@@ -78,17 +78,12 @@ class Move:
             return forward_moves if self.direction == -1 else backward_moves
         return forward_moves + backward_moves
 
-
-@dataclass
+# pylint: disable=too-few-public-methods
 class BishopMove:
     """Moves diagonally to either side of the board, backwards and forwards"""
 
-    range_: int
-    direction: int = 1
-    forward_only: bool = False
-    must_capture: bool = False
-
-    def compute_valid_moves(self, board, piece) -> List[Tuple[int, int]]:
+    @staticmethod
+    def compute_valid_moves(board, piece) -> List[Tuple[int, int]]:
         """Computes all valid moves that can be made from the passed position"""
         moves = []
         x, y = piece.position
@@ -104,7 +99,6 @@ class BishopMove:
                 pos = (pos[0] + x_dir, pos[1] + y_dir)
         return moves
 
-# pylint: disable=too-few-public-methods
 class InitialPawnMove(Move):
     """Moves 2 spaces forward"""
 
@@ -148,6 +142,7 @@ class PawnCapture:
         self.direction = direction
 
     def compute_valid_moves(self, board, piece) -> List[Tuple[int, int]]:
+        """Computes all valid moves that can be made from the passed position"""
         x, y = piece.position
         moves = ((x + 1, y + self.direction), (x - 1, y + self.direction))
         return [x for x in filter(board.is_on_board, moves)

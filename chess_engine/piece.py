@@ -70,7 +70,7 @@ class Bishop(Piece):
     """Bishop class. Contains all the bishop moves"""
 
     def __init__(self, _, position, representation):
-        moves = [move.BishopMove(8)]
+        moves = [move.BishopMove()]
         super().__init__(moves, position, representation)
 
 class Rook(Piece):
@@ -84,7 +84,7 @@ class Queen(Piece):
     """Queen class. Contains all the queen moves"""
 
     def __init__(self, _, position, representation):
-        moves = [move.RookMove(), move.BishopMove(8)]
+        moves = [move.RookMove(), move.BishopMove()]
         super().__init__(moves, position, representation)
 
 class King(Piece):
