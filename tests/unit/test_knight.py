@@ -63,7 +63,8 @@ def test_knight_capture(position, team, expected):
     piece2 = Pawn(direction=1, position=convert_str(position), representation=f'o{team}')
     board = Board(pieces=[piece, piece2], size=8)
     moves = piece.compute_valid_moves(board)
-    assert (convert_str(position) in moves) is expected
+    positions = (move.position for move in moves)
+    assert (convert_str(position) in positions) is expected
 
 def test_knight_move_through_targets():
     knight = Knight(None, convert_str("b2"), representation='N1')
@@ -73,4 +74,5 @@ def test_knight_move_through_targets():
     print(board)
 
     moves = knight.compute_valid_moves(board)
-    assert set(map(convert, moves)) == {"a4", "c4", "d3", "d1"}
+    positions = (move.position for move in moves)
+    assert set(map(convert, positions)) == {"a4", "c4", "d3", "d1"}

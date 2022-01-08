@@ -51,12 +51,12 @@ def game(board, teams, logger, depth=2, moves=50):
             if is_in_check:
                 logger.info('Moving out of check.')
 
-            rating, (piece, position) = minimax(
+            rating, (piece, move) = minimax(
                 board, team, enemy, depth=depth,
                 alpha=-math.inf, beta=math.inf, maximizing_player=True
             )
             print(f'Rating: {rating}')
-            board.move_piece_and_capture(position, piece, enemy.pieces)
+            board.move_piece_and_capture(move.position, piece, enemy.pieces)
 
             if enemy.in_check(board, team.pieces):
                 logger.info('Checking enemy king')

@@ -65,12 +65,12 @@ def minimax(board, team, enemy, depth, alpha, beta, maximizing_player):
     if maximizing_player:
         best_move = None
         max_eval = -math.inf
-        for piece, position in team.compute_valid_moves(board, enemy.pieces):
-            with ReversibleMove(board, piece, position, enemy.pieces):
+        for piece, move in team.compute_valid_moves(board, enemy.pieces):
+            with ReversibleMove(board, piece, move.position, enemy.pieces):
                 eval_position = minimax(board, team, enemy, depth-1, alpha, beta, False)[0]
 
             if eval_position > max_eval or best_move is None:
-                best_move = (piece, position)
+                best_move = (piece, move)
             max_eval = max(max_eval, eval_position)
             alpha = max(alpha, eval_position)
             if eval_position >= beta:
@@ -82,16 +82,16 @@ def minimax(board, team, enemy, depth, alpha, beta, maximizing_player):
     min_evaluation = math.inf
     min_move = math.inf
     best_min_move = None
-    for piece, position in enemy.compute_valid_moves(board, team.pieces):
-        with ReversibleMove(board, piece, position, team.pieces):
+    for piece, move in enemy.compute_valid_moves(board, team.pieces):
+        with ReversibleMove(board, piece, move.position, team.pieces):
             eval_position = minimax(board, team, enemy, depth-1, alpha, beta, True)[0]
 
         min_evaluation = min(min_evaluation, eval_position)
         if min_evaluation < min_move:
             min_move = min_evaluation
-            best_min_move = (piece, position)
+            best_min_move = (piece, move.position)
         if best_min_move is None:
-            best_min_move = (piece, position)
+            best_min_move = (piece, move.position)
 
         beta = min(beta, eval_position)
         if eval_position <= alpha:

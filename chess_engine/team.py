@@ -31,16 +31,19 @@ class Team:
 
     def compute_all_moves(self, board):
         """Returns all valid moves for all pieces passed in"""
-        return [(piece, pos) for piece in self for pos in piece.compute_valid_moves(board)]
+        return [(piece, move) for piece in self for move in piece.compute_valid_moves(board)]
 
     def compute_valid_moves(self, board, enemy_pieces):
         """Returns moves not resulting in a check of the allied king"""
         valid_moves = []
-        for piece, position in self.compute_all_moves(board):
-            with ReversibleMove(board, piece, position, enemy_pieces):
+        for piece, move in self.compute_all_moves(board):
+            with ReversibleMove(board, piece, move.position, enemy_pieces):
                 if not self.in_check(board, enemy_pieces):
-                    valid_moves.append((piece, position))
+                    valid_moves.append((piece, move))
         random.shuffle(valid_moves) #HACK to avoid the same game consistently
+
+        #move captures to beginning of list
+        valid_moves.sort(key=lambda x: x[1].can_capture, reverse=True)
         return valid_moves
 
     def in_check(self, board, enemy_pieces) -> bool:

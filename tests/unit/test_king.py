@@ -48,8 +48,9 @@ def test_king_capture(position, length, expected):
     board = Board(pieces=[piece, piece2], size=8)
 
     moves = piece.compute_valid_moves(board)
-    assert len(list(map(convert, moves))) == length
-    assert (convert_str(position) in moves) is expected
+    positions = list(move.position for move in moves)
+    assert len(list(map(convert, positions))) == length
+    assert (convert_str(position) in positions) is expected
 
 if __name__ == '__main__':
     import sys

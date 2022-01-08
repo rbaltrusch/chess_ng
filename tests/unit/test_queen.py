@@ -33,11 +33,12 @@ def test_queen_capture(position):
     piece2 = Pawn(direction=1, position=convert_str(position), representation='o2')
     board = Board(pieces=[piece, piece2], size=8)
     moves = piece.compute_valid_moves(board)
+    positions = list(move.position for move in moves)
 
     if convert_str(position) == piece.position:
-        assert convert_str(position) not in moves
+        assert convert_str(position) not in positions
     else:
-        assert convert_str(position) in moves
+        assert convert_str(position) in positions
 
 @pytest.mark.parametrize("team,expected_moves", [(2, {"a1", "a2", "a3", "b3", "c3", "c2", "c1", "b1"}),
                                                  (1, set()),
@@ -50,4 +51,5 @@ def test_queen_move_not_going_through_targets(team, expected_moves):
     print(board)
 
     moves = queen.compute_valid_moves(board)
-    assert set(map(convert, moves)) == expected_moves
+    positions = list(move.position for move in moves)
+    assert set(map(convert, positions)) == expected_moves

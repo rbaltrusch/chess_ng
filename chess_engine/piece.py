@@ -57,7 +57,7 @@ class Piece:
         """Returns true if this piece can move to the specified position.
         Note: doesnt check if piece is from opposite team.
         """
-        return position in self.compute_valid_moves(board)
+        return position in (move.position for move in self.compute_valid_moves(board))
 
 class Pawn(Piece):
     """Pawn class. Contains all the pawn moves"""

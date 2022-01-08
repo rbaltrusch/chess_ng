@@ -37,7 +37,8 @@ def test_rook_capture(position, expected):
     piece2 = Pawn(direction=1, position=convert_str(position), representation='o2')
     board = Board(pieces=[piece, piece2], size=8)
     moves = piece.compute_valid_moves(board)
-    assert (convert_str(position) in moves) is expected
+    positions = (move.position for move in moves)
+    assert (convert_str(position) in positions) is expected
 
 @pytest.mark.parametrize("team,expected_moves", [(2, {'d4', 'd6', 'c5', 'e5'}),
                                                  (1, set()),
@@ -52,4 +53,5 @@ def test_rook_move_not_going_through_targets(team, expected_moves):
     print(board)
 
     moves = rook.compute_valid_moves(board)
-    assert set(map(convert, moves)) == expected_moves
+    positions = (move.position for move in moves)
+    assert set(map(convert, positions)) == expected_moves

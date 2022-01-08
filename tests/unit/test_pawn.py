@@ -39,7 +39,8 @@ def test_pawn_capture(position):
     assert len(moves) == 2 #normal move and capture
 
     capture = convert_str(position)
-    assert capture in moves
+    positions = (move.position for move in moves)
+    assert capture in positions
     assert not board.is_empty_at(capture) #should contain black pawn
 
     board.capture_at(capture)
@@ -64,7 +65,8 @@ def test_other_pawn_capture(class_, position):
     assert len(moves) == 3 #initial move, normal move and capture
 
     capture = convert_str(position)
-    assert capture in moves
+    positions = (move.position for move in moves)
+    assert capture in positions
     assert not board.is_empty_at(capture) #should contain black pawn
 
     board.capture_at(capture)
