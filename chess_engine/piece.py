@@ -46,8 +46,10 @@ class Piece:
         if log:
             print(f'{self.team}: {self.representation} from {pos_old} to {convert(position)}')
 
-    def can_move_to(self, board, position) -> bool:
-        """Returns true if this piece can move to the specified position"""
+    def can_capture_at(self, board, position) -> bool:
+        """Returns true if this piece can move to the specified position.
+        Note: doesnt check if piece is from opposite team.
+        """
         return position in self.compute_valid_moves(board)
 
 class Pawn(Piece):
@@ -58,6 +60,13 @@ class Pawn(Piece):
                  move.PawnMove(direction),
                  move.PawnCapture(direction)]
         super().__init__(moves, position, representation)
+
+    def can_capture_at(self, board, position) -> bool:
+        """Returns true if this piece can move to the specified position"""
+        #optimization: return False if more than one square away
+        if abs(position[1] - self.position[1]) > 1:
+            return False
+        return super().can_capture_at(board, position)
 
 class Knight(Piece):
     """Knight class. Contains all the knight moves"""

@@ -41,4 +41,4 @@ class Team:
 
     def in_check(self, board, enemy_pieces) -> bool:
         """Returns True if any enemy pieces can capture at the specified position"""
-        return any(x.can_move_to(board, self.king.position) for x in enemy_pieces)
+        return any(x.can_capture_at(board, self.king.position) for x in enemy_pieces)
