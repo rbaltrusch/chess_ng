@@ -6,3 +6,4 @@ tests/reports/
 
 #profiler
 **/*.Result
+logs/

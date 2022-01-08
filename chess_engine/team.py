@@ -17,9 +17,13 @@ class Team:
     """Contains all the pieces for a side"""
 
     pieces: List[Piece]
+    representation: str
 
     def __post_init__(self):
         self.king = [x for x in self.pieces if isinstance(x, King)][0]
+
+    def __repr__(self):
+        return self.representation
 
     def __iter__(self):
         for piece in self.pieces:
