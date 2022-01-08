@@ -43,7 +43,7 @@ def test_pawn_capture(position):
     assert not board.is_empty_at(capture) #should contain black pawn
 
     board.capture_at(capture)
-    assert len(board.pieces) == 1 #black pawn captured
+    assert len(board._pieces) == 1 #black pawn captured
     assert board.is_empty_at(capture)
 
     board.move_piece(piece, capture)
@@ -68,7 +68,7 @@ def test_other_pawn_capture(class_, position):
     assert not board.is_empty_at(capture) #should contain black pawn
 
     board.capture_at(capture)
-    assert len(board.pieces) == 1 #black pawn captured
+    assert len(board._pieces) == 1 #black pawn captured
 
 @pytest.mark.parametrize("position", ["a3", "c3"])
 def test_backward_pawn_capture(position):

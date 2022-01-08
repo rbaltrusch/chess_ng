@@ -15,7 +15,7 @@ def test_board_len():
     piece = Pawn(direction=-1, position='a2', representation='o1')
     piece2 = Pawn(direction=-1, position='b5', representation='o2')
     board = Board(pieces=[piece, piece2], size=8)
-    assert len(board.pieces) == 2
+    assert len(board._pieces) == 2
 
 def test_board_capture():
     piece = Pawn(direction=-1, position='a2', representation='o1')
@@ -24,7 +24,7 @@ def test_board_capture():
 
     position = convert_str('b3')
     board.capture_at(position)
-    assert len(board.pieces) == 1
+    assert len(board._pieces) == 1
 
 @pytest.mark.parametrize('pieces,size',
     [
@@ -47,11 +47,11 @@ def test_board_getitem():
 def test_board_move_piece():
     piece = Pawn(direction=-1, position='a2', representation='o1')
     board = Board(pieces=[piece], size=8)
-    assert len(board.pieces) == 1
+    assert len(board._pieces) == 1
 
     pos = convert_str('a3')
     board.move_piece(piece, pos)
-    assert len(board.pieces) == 1
+    assert len(board._pieces) == 1
     assert board[pos] is piece
 
 def test_board_is_empty_at():
