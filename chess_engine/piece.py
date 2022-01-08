@@ -5,6 +5,7 @@ Created on Mon Feb  8 13:33:57 2021
 @author: Korean_Crimson
 """
 import logging
+import math
 from typing import List
 from typing import Tuple
 
@@ -18,7 +19,7 @@ from chess_engine.consts import ROOK
 from chess_engine.util import convert
 from chess_engine.util import convert_str
 
-TURN_COUNTER = 0
+TURN_COUNTER = 0.0
 
 class Piece:
     """Piece class. Needs to be subclassed by the various chess pieces"""
@@ -48,9 +49,9 @@ class Piece:
         self.position_history.append(position)
         if log:
             global TURN_COUNTER
-            TURN_COUNTER += 1
+            TURN_COUNTER += 0.5
             logger = logging.getLogger('game.log')
-            logger.info(f'Turn {TURN_COUNTER}: Team {self.team}: {self.representation} from {pos_old} to {convert(position)}')
+            logger.info(f'Turn {math.ceil(TURN_COUNTER)}: Team {self.team}: {self.representation} from {pos_old} to {convert(position)}')
 
     def can_capture_at(self, board, position) -> bool:
         """Returns true if this piece can move to the specified position.
