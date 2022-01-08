@@ -39,12 +39,7 @@ class Piece:
         """Returns a list of squares that the piece can move to or capture at"""
         if board in self._valid_moves:
             return self._valid_moves[board]
-
-        valid_squares = []
-        for move_ in self.moves:
-            valid_squares_ = move_.compute_valid_moves(board, self)
-            valid_squares.extend(valid_squares_)
-        return list(set(valid_squares))
+        return list({pos for move in self.moves for pos in move.compute_valid_moves(board, self)})
 
     def move_to(self, position, log=True) -> None:
         """Moves the piece to the specified position and adds it to the position history"""
