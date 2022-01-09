@@ -24,6 +24,7 @@ class Board:
         self._squares = {pos: self._pieces.get(pos) for pos in
                          itertools.product(range(size), repeat=2)}
         self.size = size
+        self.move_history = []
 
     def __repr__(self):
         #pylint: disable=invalid-name
@@ -76,6 +77,7 @@ class Board:
         piece.move_to(position, log=log)
         self._pieces[piece.position] = piece
         self._squares[piece.position] = piece
+        self.move_history.append((piece, position))
 
     def capture_at(self, position: Tuple[int, int], log=True) -> Union[None, Piece]:
         """Removes the piece at the passed position and marks it as captured"""
@@ -103,3 +105,10 @@ class Board:
         that is not the one specified.
         """
         return self[position] is not None and self[position].team != team
+
+    def is_draw_by_repetition(self, repetitions=3, number_of_teams=2) -> bool:
+        """Returns True if the teams have repeated the same moves a specified amount of times"""
+        number_of_moves = repetitions * number_of_teams * 2
+        if len(self.move_history) < number_of_moves:
+            return False
+        return len(set(self.move_history[-number_of_moves:])) == number_of_teams * 2

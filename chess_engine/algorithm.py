@@ -41,6 +41,8 @@ class ReversibleMove:
         self.piece.position_history.pop()
         self.piece.position_history.pop()
         self.board[self.position] = self.captured_piece
+        self.board.move_history.pop()
+        self.board.move_history.pop()
         if self.captured_piece is not None:
             self.captured_piece.captured = False
             self.enemy_pieces.append(self.captured_piece)
@@ -59,6 +61,9 @@ def minimax(board, team, enemy, depth, alpha, beta, maximizing_player):
     At depth=3, computation speed is still relatively fast.
     At depth=4, it slows down considerably, but does make much better moves.
     """
+    if board.is_draw_by_repetition():
+        return 0, None
+
     if depth == 0: #or game over
         return evaluate(board, team, enemy), None
 

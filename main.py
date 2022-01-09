@@ -48,6 +48,10 @@ def game(board, teams, logger, depth=2, moves=50):
                     logger.info('Stalemate. Teams draw.')
                 return
 
+            if board.is_draw_by_repetition():
+                logger.info('Draw by repetition.')
+                return
+
             if is_in_check:
                 logger.info('Moving out of check.')
 
