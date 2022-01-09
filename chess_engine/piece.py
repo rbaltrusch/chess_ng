@@ -64,10 +64,17 @@ class Pawn(Piece):
     """Pawn class. Contains all the pawn moves"""
 
     def __init__(self, direction, position, representation):
-        moves = [move.InitialPawnMove(direction),
+        self._unpromoted_moves = [move.InitialPawnMove(direction),
                  move.PawnMove(direction),
                  move.PawnCapture(direction)]
-        super().__init__(moves, position, representation)
+        self._promoted_moves = [move.RookMove(), move.BishopMove()]
+        self.direction = direction
+        super().__init__(self._unpromoted_moves, position, representation)
+
+    def compute_valid_moves(self, board) -> List[Move]:
+        """Returns a list of squares that the piece can move to or capture at"""
+        self._update_promotion(board)
+        return super().compute_valid_moves(board)
 
     def can_capture_at(self, board, position) -> bool:
         """Returns true if this piece can move to the specified position"""
@@ -75,6 +82,15 @@ class Pawn(Piece):
         if abs(position[1] - self.position[1]) > 1:
             return False
         return super().can_capture_at(board, position)
+
+    def _update_promotion(self, board):
+        target_y = 0 if self.direction == -1 else board.size - 1
+        if target_y in (y for _, y in self.position_history + [self.position]):
+            self.moves = self._promoted_moves
+            self.representation = f'{QUEEN}{self.team}'
+        else:
+            self.moves = self._unpromoted_moves
+            self.representation = f'{PAWN}{self.team}'
 
 class Knight(Piece):
     """Knight class. Contains all the knight moves"""

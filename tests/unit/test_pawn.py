@@ -94,13 +94,16 @@ def test_blocked_pawn():
     moves = piece.compute_valid_moves(board)
     assert len(moves) == 0 #no move possible
 
-def test_pawn_at_end_of_board():
-    piece = Pawn(direction=-1, position='b8', representation='o1') #white pawn
+@pytest.mark.parametrize("direction,position", [(-1, "b8"),
+                                                (1, "b1")
+                                                ])
+def test_pawn_at_end_of_board(direction, position):
+    piece = Pawn(direction=direction, position=position, representation='o1') #white pawn
     board = Board(pieces=[piece], size=8)
     moves = piece.compute_valid_moves(board)
-    assert len(moves) == 0 #no moves possible at edge of board
+    assert len(moves) == 21 #promoted to queen
 
 if __name__ == '__main__':
     import sys
     sys.path.insert(1, '..')
-    test_backward_pawn_capture('c3')
+    test_pawn_at_end_of_board()
