@@ -45,14 +45,16 @@ class Piece:
 
     def move_to(self, position, log=True) -> None:
         """Moves the piece to the specified position and adds it to the position history"""
+        #pylint: disable=logging-fstring-interpolation
         pos_old = convert(self.position)
         self.position = position
         self.position_history.append(position)
         if log:
-            global TURN_COUNTER
+            global TURN_COUNTER #pylint: disable=global-statement
             TURN_COUNTER += 0.5
             logger = logging.getLogger('game.log')
-            logger.info(f'Turn {math.ceil(TURN_COUNTER)}: Team {self.team}: {self.representation} from {pos_old} to {convert(position)}')
+            logger.info(f'Turn {math.ceil(TURN_COUNTER)}: Team {self.team}: \
+                        {self.representation} from {pos_old} to {convert(position)}')
 
     def can_capture_at(self, board, position) -> bool:
         """Returns true if this piece can move to the specified position.
