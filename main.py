@@ -33,8 +33,10 @@ def init_pieces() -> Tuple[Team, Team]:
                 pieces[team].append(new_piece)
     return Team(pieces[WHITE], WHITE), Team(pieces[BLACK], BLACK)
 
-def game(board, teams, logger, depth=2, moves=50):
+#pylint: disable=too-many-arguments
+def game(board, teams, logger, depth=2, moves=50, resign_threshold=-50):
     """Chess game function"""
+    logger.info(f'Depth: {depth}')
     for _ in range(moves):
         for team, enemy in [teams, teams[::-1]]:
             initial_time = time.time()
@@ -60,6 +62,9 @@ def game(board, teams, logger, depth=2, moves=50):
                 alpha=-math.inf, beta=math.inf, maximizing_player=True
             )
             print(f'Rating: {rating}')
+            if rating < resign_threshold:
+                logger.info(f'Team {team} resigned. Team {enemy} wins.')
+                return
             board.move_piece_and_capture(move.position, piece, enemy.pieces)
 
             if enemy.in_check(board, team.pieces):
@@ -67,6 +72,7 @@ def game(board, teams, logger, depth=2, moves=50):
 
             print(f'Time taken for turn: {round(time.time() - initial_time, 1)}s')
             print(board)
+    logger.info(board)
 
 def main():
     """Main function"""
@@ -75,8 +81,8 @@ def main():
     teams = init_pieces()
     board = Board([piece for team in teams for piece in team], size=8)
     with Logger(folder='logs', filename='game.log') as logger:
-        logger.info(f'Seed: {seed}')
-        game(board, teams, logger, depth=2, moves=50)
+        logger.info('Seed: %s', seed)
+        game(board, teams, logger, depth=4, moves=150, resign_threshold=-50)
 
 if __name__ == '__main__':
     main()
