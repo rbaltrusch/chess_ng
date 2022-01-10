@@ -25,13 +25,10 @@ class Team:
     def __repr__(self):
         return self.representation
 
-    def __iter__(self):
-        for piece in self.pieces:
-            yield piece
-
     def compute_all_moves(self, board):
         """Returns all valid moves for all pieces passed in"""
-        return [(piece, move) for piece in self for move in piece.compute_valid_moves(board)]
+        return [(piece, move) for piece in self.pieces
+                for move in piece.compute_valid_moves(board)]
 
     def compute_valid_moves(self, board, enemy_pieces):
         """Returns moves not resulting in a check of the allied king"""

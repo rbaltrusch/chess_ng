@@ -84,7 +84,7 @@ def main():
     seed = 0
     random.seed(seed)
     teams = init_pieces()
-    board = Board([piece for team in teams for piece in team], size=8)
+    board = Board([piece for team in teams for piece in team.pieces], size=8)
     with Logger(folder='logs', filename='game.log') as logger:
         logger.info('Seed: %s', seed)
         game(board, teams, logger, depth=4, moves=150, resign_threshold=-50)
