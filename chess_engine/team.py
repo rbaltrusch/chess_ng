@@ -45,4 +45,6 @@ class Team:
 
     def in_check(self, board, enemy_pieces) -> bool:
         """Returns True if any enemy pieces can capture at the specified position"""
-        return any(x.can_capture_at(board, self.king.position) for x in enemy_pieces)
+        #optimization: True for all truthy elements.
+        #Directly checking capture state would be slower
+        return any(True for x in enemy_pieces if x.can_capture_at(board, self.king.position))
