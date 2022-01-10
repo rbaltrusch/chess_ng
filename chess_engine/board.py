@@ -19,8 +19,8 @@ from .piece import Piece
 class Board:
     """Board class. Contains all the pieces on the chess board"""
 
-    def __init__(self, pieces: List[Piece], size: int):
-        self._pieces = {piece.position: piece for piece in pieces}
+    def __init__(self, pieces: List[Piece] = None, size = 8):
+        self._pieces = {piece.position: piece for piece in pieces} if pieces is not None else {}
         self._squares = {pos: self._pieces.get(pos) for pos in
                          itertools.product(range(size), repeat=2)}
         self.size = size
