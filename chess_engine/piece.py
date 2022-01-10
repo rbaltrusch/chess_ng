@@ -17,6 +17,8 @@ from chess_engine.consts import QUEEN
 from chess_engine.consts import ROOK
 from chess_engine.util import convert
 from chess_engine.util import convert_str
+from chess_engine.util import is_diagonal
+from chess_engine.util import is_straight
 
 from .move import Move
 
@@ -41,7 +43,7 @@ class Piece:
 
     def compute_valid_moves(self, board) -> List[Move]:
         """Returns a list of squares that the piece can move to or capture at"""
-        return list({pos for move in self.moves for pos in move.compute_valid_moves(board, self)})
+        return [pos for move in self.moves for pos in move.compute_valid_moves(board, self)]
 
     def move_to(self, position, log=True) -> None:
         """Moves the piece to the specified position and adds it to the position history"""
@@ -53,8 +55,7 @@ class Piece:
             global TURN_COUNTER #pylint: disable=global-statement
             TURN_COUNTER += 0.5
             logger = logging.getLogger('game.log')
-            logger.info(f'Turn {math.ceil(TURN_COUNTER)}: Team {self.team}: \
-                        {self.representation} from {pos_old} to {convert(position)}')
+            logger.info(f'Turn {math.ceil(TURN_COUNTER)}: Team {self.team}: {self.representation} from {pos_old} to {convert(position)}')
 
     def can_capture_at(self, board, position) -> bool:
         """Returns true if this piece can move to the specified position.
@@ -104,12 +105,28 @@ class Knight(Piece):
         moves = [move.KnightMove()]
         super().__init__(moves, position, representation)
 
+    def can_capture_at(self, board, position) -> bool:
+        """Returns true if this piece can move to the specified position"""
+        x1, y1 = position
+        x2, y2 = self.position
+        #optimization: return False if not L-shaped 2 and 1 squares away
+        if {abs(x1 - x2), abs(y1 - y2) > 1} != {1, 2}:
+            return False
+        return super().can_capture_at(board, position)
+
 class Bishop(Piece):
     """Bishop class. Contains all the bishop moves"""
 
     def __init__(self, _, position, representation):
         moves = [move.BishopMove()]
         super().__init__(moves, position, representation)
+
+    def can_capture_at(self, board, position) -> bool:
+        """Returns true if this piece can move to the specified position"""
+        #optimization: return False if not on same diagonal
+        if not is_diagonal(position, self.position):
+            return False
+        return super().can_capture_at(board, position)
 
 class Rook(Piece):
     """Rook class. Contains all the rook moves"""
@@ -118,6 +135,13 @@ class Rook(Piece):
         moves = [move.RookMove()]
         super().__init__(moves, position, representation)
 
+    def can_capture_at(self, board, position) -> bool:
+        """Returns true if this piece can move to the specified position"""
+        #optimization: return False if not horizontally or vertically aligned
+        if not is_straight(position, self.position):
+            return False
+        return super().can_capture_at(board, position)
+
 class Queen(Piece):
     """Queen class. Contains all the queen moves"""
 
@@ -125,12 +149,30 @@ class Queen(Piece):
         moves = [move.RookMove(), move.BishopMove()]
         super().__init__(moves, position, representation)
 
+    def can_capture_at(self, board, position) -> bool:
+        """Returns true if this piece can move to the specified position"""
+        #optimization: return False if not horizontally or vertically aligned
+        #and not same diagonal
+        if (not is_straight(position, self.position)
+            and not is_diagonal(position, self.position)):
+            return False
+        return super().can_capture_at(board, position)
+
 class King(Piece):
     """King class. Contains all the king moves"""
 
     def __init__(self, _, position, representation):
         moves = [move.KingMove()]
         super().__init__(moves, position, representation)
+
+    def can_capture_at(self, board, position) -> bool:
+        """Returns true if this piece can move to the specified position"""
+        x1, y1 = position
+        x2, y2 = self.position
+        #optimization: return False if more than one square away
+        if abs(x1 - x2) > 1 or abs(y1 - y2) > 1:
+            return False
+        return super().can_capture_at(board, position)
 
 PIECES = {PAWN: Pawn,
           KNIGHT: Knight,
