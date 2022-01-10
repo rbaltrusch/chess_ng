@@ -160,15 +160,19 @@ class KingMove:
                 moves.append(Move(pos, can_capture=True))
         return moves
 
-class PawnMove(LineMove):
+class PawnMove:
     """Moves 1 space forward"""
 
     def __init__(self, direction):
-        range_ = 1
-        super().__init__(
-            range_, direction, forward_only=True, can_capture=False
-        )
+        self.direction = direction
 
+    def compute_valid_moves(self, board, piece) -> List[Move]:
+        """Computes all valid moves that can be made from the passed position"""
+        x, y = piece.position
+        pos = (x, y + 1 * self.direction)
+        if board.is_on_board(pos) and board.is_empty_at(pos):
+            return [Move(pos)]
+        return []
 
 class PawnCapture:
     """Moves 1 space forward diagonally and needs to capture"""
