@@ -28,11 +28,13 @@ def convert_str(string: str) -> Tuple[int, int]:
     return (x, y)
 
 def is_diagonal(position1: Tuple[int, int], position2: Tuple[int, int]):
+    """Returns True if position1 and position2 are on a diagonal line"""
     x1, y1 = position1
     x2, y2 = position2
     return abs(x1 - x2) == abs(y1 - y2)
 
 def is_straight(position1: Tuple[int, int], position2: Tuple[int, int]):
+    """Returns True if position1 and position2 are horizontally or vertically aligned"""
     x1, y1 = position1
     x2, y2 = position2
     return x1 == x2 or y1 == y2

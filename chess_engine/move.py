@@ -11,6 +11,8 @@ from typing import Tuple
 
 @dataclass
 class Move:
+    """Moves class, takes a position that can be moved to and whether it is a capture or not"""
+
     position: Tuple[int, int]
     can_capture: bool = False
 
@@ -18,6 +20,7 @@ class Move:
         return hash(self.position)
 
     def __iter__(self):
+        #pylint: disable=invalid-name
         for x in self.position:
             yield x
 
