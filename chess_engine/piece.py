@@ -70,6 +70,7 @@ class Pawn(Piece):
                  move.PawnMove(direction),
                  move.PawnCapture(direction)]
         self._promoted_moves = [move.RookMove(), move.BishopMove()]
+        self.promoted = False
         self.direction = direction
         super().__init__(self._unpromoted_moves, position, representation)
 
@@ -81,16 +82,18 @@ class Pawn(Piece):
     def can_capture_at(self, board, position) -> bool:
         """Returns true if this piece can move to the specified position"""
         #optimization: return False if more than one square away
-        if abs(position[1] - self.position[1]) > 1:
+        if not self.promoted and abs(position[1] - self.position[1]) > 1:
             return False
         return super().can_capture_at(board, position)
 
     def _update_promotion(self, board):
         target_y = 0 if self.direction == -1 else board.size - 1
         if target_y in (y for _, y in self.position_history + [self.position]):
+            self.promoted = True
             self.moves = self._promoted_moves
             self.representation = f'{QUEEN}{self.team}'
         else:
+            self.promoted = False
             self.moves = self._unpromoted_moves
             self.representation = f'{PAWN}{self.team}'
 
