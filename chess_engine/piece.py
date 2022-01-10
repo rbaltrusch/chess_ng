@@ -24,6 +24,7 @@ from .move import Move
 
 TURN_COUNTER = 0.0
 
+#pylint: disable=invalid-name
 class Piece:
     """Piece class. Needs to be subclassed by the various chess pieces"""
 
@@ -55,7 +56,8 @@ class Piece:
             global TURN_COUNTER #pylint: disable=global-statement
             TURN_COUNTER += 0.5
             logger = logging.getLogger('game.log')
-            logger.info(f'Turn {math.ceil(TURN_COUNTER)}: Team {self.team}: {self.representation} from {pos_old} to {convert(position)}')
+            move_ = f'{self.representation} from {pos_old} to {convert(position)}'
+            logger.info(f'Turn {math.ceil(TURN_COUNTER)}: Team {self.team}: {move_}')
 
     def can_capture_at(self, board, position) -> bool:
         """Returns true if this piece can move to the specified position.
