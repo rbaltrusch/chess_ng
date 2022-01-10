@@ -96,9 +96,7 @@ class Board:
 
     def is_on_board(self, position: Tuple[int, int]) -> bool:
         """Returns True if the checked position is on the board"""
-        #pylint: disable=invalid-name
-        x, y = position
-        return 0 <= x < self.size and 0 <= y < self.size
+        return position in self._squares
 
     def is_enemy(self, position: Tuple[int, int], team: int) -> bool:
         """Returns True if the checked position contains a piece with a team
