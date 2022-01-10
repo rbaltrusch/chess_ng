@@ -24,7 +24,7 @@ class Board:
         self._squares = {pos: self._pieces.get(pos) for pos in
                          itertools.product(range(size), repeat=2)}
         self.size = size
-        self.move_history = []
+        self.move_history: List[Tuple[Piece, Tuple[int, int]]] = []
 
     def __repr__(self):
         #pylint: disable=invalid-name
