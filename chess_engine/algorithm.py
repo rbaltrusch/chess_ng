@@ -9,6 +9,8 @@ from dataclasses import dataclass
 from typing import List
 from typing import Tuple
 
+import numpy as np
+
 from .board import Board
 from .piece import Piece
 
@@ -54,6 +56,33 @@ def evaluate(board, team, enemy):
     """
     #HACK: using compute_all_moves instead of compute_valid_moves to save computation time
     return len(team.compute_all_moves(board)) - len(enemy.compute_all_moves(board))
+
+def evaluate2(board, team, enemy):
+    """Evaluates board state based on the closeness to the enemy king"""
+    #HACK: using compute_all_moves instead of compute_valid_moves to save computation time
+    #pylint: disable=invalid-name
+    def inverse_distance(point1, point2):
+        x1, y1 = point1
+        x2, y2 = point2
+        value = math.sqrt((x1 - x2) ** 2 + abs(y1 - y2) ** 2)
+        if value == 0:
+            return 1
+        return 1 / value
+    sum_ally = sum(inverse_distance(enemy.king.position, move.position)
+                   for _, move in team.compute_all_moves(board))
+    sum_enemy = sum(inverse_distance(team.king.position, move.position)
+                    for _, move in enemy.compute_all_moves(board))
+    return sum_ally - sum_enemy
+
+def evaluate3(board, team, enemy):
+    """Evaluates board state based on the closeness to the enemy king"""
+    ally_moves = np.array([move.position for _, move in team.compute_all_moves(board)])
+    enemy_moves = np.array([move.position for _, move in enemy.compute_all_moves(board)])
+    king_position = np.array([team.king.position])
+    enemy_king_position = np.array([enemy.king.position])
+    ally_distances = np.linalg.norm(enemy_king_position - ally_moves)
+    enemy_distances = np.linalg.norm(king_position - enemy_moves)
+    return enemy_distances - ally_distances
 
 #pylint: disable=too-many-arguments,too-many-locals #for now...
 def minimax(board, team, enemy, depth, alpha, beta, maximizing_player):
