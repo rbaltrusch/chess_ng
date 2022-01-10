@@ -9,6 +9,7 @@ import random
 import time
 from typing import Tuple
 
+from chess_engine.algorithm import evaluate_distance
 from chess_engine.algorithm import minimax
 from chess_engine.board import Board
 from chess_engine.consts import BLACK
@@ -59,7 +60,9 @@ def game(board, teams, logger, depth=2, moves=50, resign_threshold=-50):
 
             rating, (piece, move) = minimax(
                 board, team, enemy, depth=depth,
-                alpha=-math.inf, beta=math.inf, maximizing_player=True
+                alpha=-math.inf, beta=math.inf,
+                evaluation_function=evaluate_distance,
+                maximizing_player=True
             )
             print(f'Rating: {rating}')
             if rating < resign_threshold:
@@ -72,6 +75,8 @@ def game(board, teams, logger, depth=2, moves=50, resign_threshold=-50):
 
             print(f'Time taken for turn: {round(time.time() - initial_time, 1)}s')
             print(board)
+
+    print('Finished')
     logger.info(board)
 
 def main():

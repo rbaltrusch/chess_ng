@@ -50,14 +50,14 @@ class ReversibleMove:
             self.enemy_pieces.append(self.captured_piece)
 
 
-def evaluate(board, team, enemy):
+def evaluate_length(board, team, enemy):
     """Evaluates the board state based on the amount of moves allied pieces
     and enemy pieces can make.
     """
     #HACK: using compute_all_moves instead of compute_valid_moves to save computation time
     return len(team.compute_all_moves(board)) - len(enemy.compute_all_moves(board))
 
-def evaluate2(board, team, enemy):
+def evaluate_distance(board, team, enemy):
     """Evaluates board state based on the closeness to the enemy king"""
     #HACK: using compute_all_moves instead of compute_valid_moves to save computation time
     #pylint: disable=invalid-name
@@ -74,8 +74,9 @@ def evaluate2(board, team, enemy):
                     for _, move in enemy.compute_all_moves(board))
     return sum_ally - sum_enemy
 
-def evaluate3(board, team, enemy):
+def evaluate_distance_np(board, team, enemy):
     """Evaluates board state based on the closeness to the enemy king"""
+    #seems to lead to very wonky games...
     ally_moves = np.array([move.position for _, move in team.compute_all_moves(board)])
     enemy_moves = np.array([move.position for _, move in enemy.compute_all_moves(board)])
     king_position = np.array([team.king.position])
@@ -85,7 +86,8 @@ def evaluate3(board, team, enemy):
     return enemy_distances - ally_distances
 
 #pylint: disable=too-many-arguments,too-many-locals #for now...
-def minimax(board, team, enemy, depth, alpha, beta, maximizing_player):
+def minimax(board, team, enemy, depth,
+            alpha, beta, evaluation_function, maximizing_player):
     """Minimax algorithm with alpha-beta pruning.
     At depth=3, computation speed is still relatively fast.
     At depth=4, it slows down considerably, but does make much better moves.
@@ -94,14 +96,15 @@ def minimax(board, team, enemy, depth, alpha, beta, maximizing_player):
         return 0, None
 
     if depth == 0: #or game over
-        return evaluate(board, team, enemy), None
+        return evaluation_function(board, team, enemy), None
 
     if maximizing_player:
         best_move = None
         max_eval = -math.inf
         for piece, move in team.compute_valid_moves(board, enemy.pieces):
             with ReversibleMove(board, piece, move.position, enemy.pieces):
-                eval_position = minimax(board, team, enemy, depth-1, alpha, beta, False)[0]
+                eval_position = minimax(board, team, enemy, depth-1, alpha, beta,
+                                        evaluation_function, False)[0]
 
             if eval_position > max_eval or best_move is None:
                 best_move = (piece, move)
@@ -118,7 +121,8 @@ def minimax(board, team, enemy, depth, alpha, beta, maximizing_player):
     best_min_move = None
     for piece, move in enemy.compute_valid_moves(board, team.pieces):
         with ReversibleMove(board, piece, move.position, team.pieces):
-            eval_position = minimax(board, team, enemy, depth-1, alpha, beta, True)[0]
+            eval_position = minimax(board, team, enemy, depth-1, alpha, beta,
+                                    evaluation_function, True)[0]
 
         min_evaluation = min(min_evaluation, eval_position)
         if min_evaluation < min_move:
