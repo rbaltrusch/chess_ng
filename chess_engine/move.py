@@ -124,19 +124,22 @@ class BishopMove:
                 pos = (pos[0] + x_dir, pos[1] + y_dir)
         return moves
 
-class InitialPawnMove(LineMove):
+class InitialPawnMove:
     """Moves 2 spaces forward"""
 
     def __init__(self, direction):
-        range_ = 2
-        super().__init__(
-            range_, direction, forward_only=True, can_capture=False
-        )
+        self.direction = direction
 
     def compute_valid_moves(self, board, piece) -> List[Move]:
+        """Computes all valid moves that can be made from the passed position"""
         if len(piece.position_history):
             return []
-        return super().compute_valid_moves(board, piece)
+        x, y = piece.position
+        dir_ = self.direction
+        def empty(y_):
+            pos = (x, y + y_ * dir_)
+            return board.is_empty_at(pos) and board.is_on_board(pos)
+        return [Move((x, y + 2 * dir_))] if empty(1) and empty(2) else []
 
 class KingMove:
     """Moves 1 space in any direction"""
