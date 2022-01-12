@@ -42,6 +42,9 @@ class Piece:
     def __hash__(self):
         return hash((self.position, self.representation))
 
+    def update(self):
+        pass
+
     def increase_search_depth(self, search_depth):
         return search_depth
 
@@ -100,11 +103,17 @@ class Pawn(Piece):
         if target_y in (y for _, y in self.position_history + [self.position]):
             self.promoted = True
             self.moves = self._promoted_moves
-            self.representation = f'{QUEEN}{self.team}'
         else:
             self.promoted = False
             self.moves = self._unpromoted_moves
-            self.representation = f'{PAWN}{self.team}'
+
+    @property
+    def representation(self):
+        return f'{QUEEN}{self.team}' if self.promoted else f'{PAWN}{self.team}'
+
+    @representation.setter
+    def representation(self, value):
+        pass
 
 class Knight(Piece):
     """Knight class. Contains all the knight moves"""

@@ -43,6 +43,7 @@ class ReversibleMove:
         )
         self.piece.position_history.pop()
         self.piece.position_history.pop()
+        self.piece.update()
         self.board[self.position] = self.captured_piece
         self.board.move_history.pop()
         self.board.move_history.pop()
