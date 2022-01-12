@@ -127,7 +127,7 @@ class Knight(Piece):
         x1, y1 = position
         x2, y2 = self.position
         #optimization: return False if not L-shaped 2 and 1 squares away
-        if {abs(x1 - x2), abs(y1 - y2) > 1} != {1, 2}:
+        if {abs(x1 - x2), abs(y1 - y2)} != {1, 2}:
             return False
         return super().can_capture_at(board, position)
 
