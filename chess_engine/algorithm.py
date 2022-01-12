@@ -57,6 +57,15 @@ def evaluate_length(board, team, enemy):
     #HACK: using compute_all_moves instead of compute_valid_moves to save computation time
     return len(team.compute_all_moves(board)) - len(enemy.compute_all_moves(board))
 
+def evaluate_length_with_captures(board, team, enemy):
+    """Evaluates the board state based on the amount of moves allied pieces
+    and enemy pieces can make.
+    """
+    #HACK: using compute_all_moves instead of compute_valid_moves to save computation time
+    ally_moves = sum([2 if move.can_capture else 1 for _, move in team.compute_all_moves(board)])
+    enemy_moves = sum([3 if move.can_capture else 1 for _, move in enemy.compute_all_moves(board)])
+    return (ally_moves - 1) / enemy_moves if enemy_moves else math.inf
+
 def evaluate_distance(board, team, enemy):
     """Evaluates board state based on the closeness to the enemy king"""
     #HACK: using compute_all_moves instead of compute_valid_moves to save computation time
