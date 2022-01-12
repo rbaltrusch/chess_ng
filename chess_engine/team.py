@@ -11,6 +11,7 @@ from typing import List
 from .algorithm import ReversibleMove
 from .piece import King
 from .piece import Piece
+from .piece import Queen
 
 @dataclass
 class Team:
@@ -21,6 +22,7 @@ class Team:
 
     def __post_init__(self):
         self.king = [x for x in self.pieces if isinstance(x, King)][0]
+        self.queen = [x for x in self.pieces if isinstance(x, Queen)][0]
 
     def __repr__(self):
         return self.representation

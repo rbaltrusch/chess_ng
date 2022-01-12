@@ -9,8 +9,8 @@ import random
 import time
 from typing import Tuple
 
-from chess_engine.algorithm import evaluate_distance
-from chess_engine.algorithm import minimax
+from chess_engine.algorithm import evaluate_length_with_captures
+from chess_engine.algorithm import Minimax
 from chess_engine.board import Board
 from chess_engine.consts import BLACK
 from chess_engine.consts import BOARD
@@ -38,6 +38,7 @@ def init_pieces() -> Tuple[Team, Team]:
 def game(board, teams, logger, depth=2, moves=50, resign_threshold=-50):
     """Chess game function"""
     logger.info(f'Depth: {depth}')
+    minimax = Minimax(evaluation_function=evaluate_length_with_captures)
     for _ in range(moves):
         for team, enemy in [teams, teams[::-1]]:
             initial_time = time.time()
@@ -58,10 +59,11 @@ def game(board, teams, logger, depth=2, moves=50, resign_threshold=-50):
             if is_in_check:
                 logger.info('Moving out of check.')
 
-            rating, (piece, move) = minimax(
+            team.queen.depth_counter = 0
+            enemy.queen.depth_counter = 0
+            rating, (piece, move) = minimax.run(
                 board, team, enemy, depth=depth,
                 alpha=-math.inf, beta=math.inf,
-                evaluation_function=evaluate_distance,
                 maximizing_player=True
             )
             print(f'Rating: {rating}')

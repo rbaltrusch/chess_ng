@@ -42,6 +42,9 @@ class Piece:
     def __hash__(self):
         return hash((self.position, self.representation))
 
+    def increase_search_depth(self, search_depth):
+        return search_depth
+
     def compute_valid_moves(self, board) -> List[Move]:
         """Returns a list of squares that the piece can move to or capture at"""
         return [pos for move in self.moves for pos in move.compute_valid_moves(board, self)]
@@ -76,6 +79,9 @@ class Pawn(Piece):
         self.promoted = False
         self.direction = direction
         super().__init__(self._unpromoted_moves, position, representation)
+
+    def update(self, board):
+        self._update_promotion(board)
 
     def compute_valid_moves(self, board) -> List[Move]:
         """Returns a list of squares that the piece can move to or capture at"""
@@ -149,7 +155,14 @@ class Queen(Piece):
 
     def __init__(self, _, position, representation):
         moves = [move.RookMove(), move.BishopMove()]
+        self.depth_counter = 3
         super().__init__(moves, position, representation)
+
+    def increase_search_depth(self, search_depth):
+        if self.depth_counter <= 0:
+            return search_depth
+        self.depth_counter -= 1
+        return search_depth + 2
 
     def can_capture_at(self, board, position) -> bool:
         """Returns true if this piece can move to the specified position"""

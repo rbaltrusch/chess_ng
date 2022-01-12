@@ -6,6 +6,7 @@ Created on Fri Jan  7 14:33:33 2022
 """
 import math
 from dataclasses import dataclass
+from typing import Callable
 from typing import List
 from typing import Tuple
 
@@ -94,56 +95,57 @@ def evaluate_distance_np(board, team, enemy):
     enemy_distances = np.linalg.norm(king_position - enemy_moves)
     return enemy_distances - ally_distances
 
-#pylint: disable=too-many-arguments,too-many-locals #for now...
-def minimax(board, team, enemy, depth,
-            alpha, beta, evaluation_function, maximizing_player):
-    """Minimax algorithm with alpha-beta pruning.
-    At depth=3, computation speed is still relatively fast.
-    At depth=4, it slows down considerably, but does make much better moves.
-    """
-    if board.is_draw_by_repetition():
-        return 0, None
+@dataclass
+class Minimax:
 
-    if depth == 0: #or game over
-        return evaluation_function(board, team, enemy), None
+    evaluation_function: Callable
 
-    if maximizing_player:
-        best_move = None
-        max_eval = -math.inf
-        for piece, move in team.compute_valid_moves(board, enemy.pieces):
-            with ReversibleMove(board, piece, move.position, enemy.pieces):
-                eval_position = minimax(board, team, enemy, depth-1, alpha, beta,
-                                        evaluation_function, False)[0]
+    #pylint: disable=too-many-arguments,too-many-locals #for now...
+    def run(self, board, team, enemy, depth, alpha, beta, maximizing_player):
+        """Minimax algorithm with alpha-beta pruning.
+        At depth=3, computation speed is still relatively fast.
+        At depth=4, it slows down considerably, but does make much better moves.
+        """
+        if board.is_draw_by_repetition():
+            return 0, None
 
-            if eval_position > max_eval or best_move is None:
-                best_move = (piece, move)
-            max_eval = max(max_eval, eval_position)
-            alpha = max(alpha, eval_position)
-            if eval_position >= beta:
+        if depth == 0: #or game over
+            return self.evaluation_function(board, team, enemy), None
+
+        if maximizing_player:
+            best_move = None
+            max_eval = -math.inf
+            for piece, move in team.compute_valid_moves(board, enemy.pieces):
+                search_depth = depth - 1
+                search_depth = piece.increase_search_depth(search_depth)
+                with ReversibleMove(board, piece, move.position, enemy.pieces):
+                    eval_position = self.run(board, team, enemy, search_depth, alpha, beta, False)[0]
+
+                if eval_position > max_eval or best_move is None:
+                    best_move = (piece, move)
+                max_eval = max(max_eval, eval_position)
+                alpha = max(alpha, eval_position)
+                if eval_position >= beta:
+                    break
+                if beta <= alpha:
+                    break
+            return max_eval, best_move
+
+        min_evaluation = math.inf
+        min_move = None
+        for piece, move in enemy.compute_valid_moves(board, team.pieces):
+            search_depth = depth - 1
+            search_depth = piece.increase_search_depth(search_depth)
+            with ReversibleMove(board, piece, move.position, team.pieces):
+                eval_position = self.run(board, team, enemy, search_depth, alpha, beta, True)[0]
+
+            if eval_position < min_evaluation or min_move is None:
+                min_move = (piece, move.position)
+            min_evaluation = min(min_evaluation, eval_position)
+            beta = min(beta, eval_position)
+            if eval_position <= alpha:
                 break
             if beta <= alpha:
                 break
-        return max_eval, best_move
 
-    min_evaluation = math.inf
-    min_move = math.inf
-    best_min_move = None
-    for piece, move in enemy.compute_valid_moves(board, team.pieces):
-        with ReversibleMove(board, piece, move.position, team.pieces):
-            eval_position = minimax(board, team, enemy, depth-1, alpha, beta,
-                                    evaluation_function, True)[0]
-
-        min_evaluation = min(min_evaluation, eval_position)
-        if min_evaluation < min_move:
-            min_move = min_evaluation
-            best_min_move = (piece, move.position)
-        if best_min_move is None:
-            best_min_move = (piece, move.position)
-
-        beta = min(beta, eval_position)
-        if eval_position <= alpha:
-            break
-        if beta <= alpha:
-            break
-
-    return min_evaluation, best_min_move
+        return min_evaluation, min_move
