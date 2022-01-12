@@ -43,7 +43,7 @@ class ReversibleMove:
         )
         self.piece.position_history.pop()
         self.piece.position_history.pop()
-        self.piece.update()
+        self.piece.update(self.board)
         self.board[self.position] = self.captured_piece
         self.board.move_history.pop()
         self.board.move_history.pop()
@@ -98,6 +98,7 @@ def evaluate_distance_np(board, team, enemy):
 
 @dataclass
 class Minimax:
+    """Minimax algorithm class with alpha-beta pruning and customizable evaluation"""
 
     evaluation_function: Callable
 
@@ -120,7 +121,8 @@ class Minimax:
                 search_depth = depth - 1
                 search_depth = piece.increase_search_depth(search_depth)
                 with ReversibleMove(board, piece, move.position, enemy.pieces):
-                    eval_position = self.run(board, team, enemy, search_depth, alpha, beta, False)[0]
+                    eval_position = self.run(board, team, enemy,
+                                             search_depth, alpha, beta, False)[0]
 
                 if eval_position > max_eval or best_move is None:
                     best_move = (piece, move)

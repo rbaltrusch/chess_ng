@@ -42,10 +42,11 @@ class Piece:
     def __hash__(self):
         return hash((self.position, self.representation))
 
-    def update(self):
-        pass
+    def update(self, board): #pylint: disable=no-self-use
+        """Update piece"""
 
-    def increase_search_depth(self, search_depth):
+    def increase_search_depth(self, search_depth): #pylint: disable=no-self-use
+        """Does nothing to search depth"""
         return search_depth
 
     def compute_valid_moves(self, board) -> List[Move]:
@@ -109,6 +110,7 @@ class Pawn(Piece):
 
     @property
     def representation(self):
+        """Representation getter, depends on the promoted state"""
         return f'{QUEEN}{self.team}' if self.promoted else f'{PAWN}{self.team}'
 
     @representation.setter
