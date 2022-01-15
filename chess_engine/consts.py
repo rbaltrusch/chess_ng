@@ -7,7 +7,7 @@ Created on Mon Feb  8 12:43:27 2021
 
 PAWN = 'o'
 KNIGHT = 'N'
-BISHOP = 'L'
+BISHOP = 'B'
 ROOK = 'R'
 QUEEN = 'Q'
 KING = 'K'
