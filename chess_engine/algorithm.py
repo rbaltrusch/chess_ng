@@ -68,6 +68,9 @@ def evaluate_length_with_captures(board, team, enemy):
     enemy_moves = sum([3 if move.can_capture else 1 for _, move in enemy.compute_all_moves(board)])
     return (ally_moves - 1) / enemy_moves if enemy_moves else math.inf
 
+def mating_strategy(board, team, enemy):
+    return len(team.compute_valid_moves(board, enemy.pieces)) - len(enemy.king.compute_valid_moves(board))
+
 def evaluate_distance(board, team, enemy):
     """Evaluates board state based on the closeness to the enemy king"""
     #HACK: using compute_all_moves instead of compute_valid_moves to save computation time
