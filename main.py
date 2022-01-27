@@ -9,12 +9,16 @@ import random
 import time
 from typing import Tuple
 
-from chess_engine.algorithm import evaluate_length_with_captures
+from chess_engine import hashing
+from chess_engine.algorithm import evaluate_length
+from chess_engine.algorithm import mating_strategy
 from chess_engine.algorithm import Minimax
 from chess_engine.board import Board
 from chess_engine.consts import BLACK
 from chess_engine.consts import BOARD
 from chess_engine.consts import DIRECTIONS
+from chess_engine.consts import LATE_VALUES
+from chess_engine.consts import MID_VALUES
 from chess_engine.consts import WHITE
 from chess_engine.output import Logger
 from chess_engine.piece import PIECES
@@ -34,12 +38,20 @@ def init_pieces() -> Tuple[Team, Team]:
                 pieces[team].append(new_piece)
     return Team(pieces[WHITE], WHITE), Team(pieces[BLACK], BLACK)
 
-#pylint: disable=too-many-arguments
-def game(board, teams, logger, depth=2, moves=50, resign_threshold=-50):
+#pylint: disable=too-many-arguments,too-many-locals,too-many-branches
+def game(board, teams, hash_values, logger, depth=2, moves=50,
+         resign_threshold=-50, mating_threshold=10):
     """Chess game function"""
     logger.info(f'Depth: {depth}')
-    minimax = Minimax(evaluation_function=evaluate_length_with_captures)
-    for _ in range(moves):
+    minimax = Minimax(evaluation_function=evaluate_length, hash_values=hash_values)
+    for i in range(moves):
+        if i > 15:
+            for team in teams:
+                team.sort_pieces(MID_VALUES)
+        elif i > 30:
+            for team in teams:
+                team.sort_pieces(LATE_VALUES)
+
         for team, enemy in [teams, teams[::-1]]:
             initial_time = time.time()
             is_in_check = team.in_check(board, enemy.pieces)
@@ -72,6 +84,10 @@ def game(board, teams, logger, depth=2, moves=50, resign_threshold=-50):
                 return
             board.move_piece_and_capture(move.position, piece, enemy.pieces)
 
+            if rating > mating_threshold:
+                minimax.evaluation_function = mating_strategy
+                logger.info('Mating activated')
+
             if enemy.in_check(board, team.pieces):
                 logger.info('Checking enemy king')
 
@@ -86,10 +102,14 @@ def main():
     seed = 0
     random.seed(seed)
     teams = init_pieces()
-    board = Board([piece for team in teams for piece in team.pieces], size=8)
+    pieces = [piece for team in teams for piece in team.pieces]
+    board = Board(pieces, size=8)
+    hash_values = hashing.get_hash_values(pieces)
+
     with Logger(folder='logs', filename='game.log') as logger:
         logger.info('Seed: %s', seed)
-        game(board, teams, logger, depth=4, moves=150, resign_threshold=-50)
+        game(board, teams, hash_values, logger, depth=5, moves=10,
+             resign_threshold=-50, mating_threshold=20)
 
 if __name__ == '__main__':
     main()
