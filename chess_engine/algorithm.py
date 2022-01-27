@@ -70,7 +70,9 @@ def evaluate_length_with_captures(board, team, enemy):
     return (ally_moves - 1) / enemy_moves if enemy_moves else math.inf
 
 def mating_strategy(board, team, enemy):
-    return len(team.compute_valid_moves(board, enemy.pieces)) - len(enemy.king.compute_valid_moves(board))
+    """Incentivizes disabling the enemy kings movements while keeping own movement high"""
+    return (len(team.compute_valid_moves(board, enemy.pieces))
+            - len(enemy.king.compute_valid_moves(board)))
 
 def evaluate_distance(board, team, enemy):
     """Evaluates board state based on the closeness to the enemy king"""
@@ -110,7 +112,7 @@ class Minimax:
     def __post_init__(self):
         self.board_hashes = {}
 
-    #pylint: disable=too-many-arguments,too-many-locals #for now...
+    #pylint: disable=too-many-arguments,too-many-locals,too-many-branches #for now...
     def run(self, board, team, enemy, depth, alpha, beta, maximizing_player):
         """Minimax algorithm with alpha-beta pruning.
         At depth=3, computation speed is still relatively fast.

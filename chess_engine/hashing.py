@@ -36,6 +36,7 @@ def compute_hash(board, hash_values) -> int:
 
 def update_hash(hash_, board, hash_values, changed_positions) -> int:
     """Updates the Zobrist hash by xor gating. 100 times fasteer than generating new hash"""
+    #pylint: disable=invalid-name
     exponent = math.ceil(math.log(len(hash_values), 2))
     max_ = 2 ** exponent - 1
     for x, y in changed_positions:
