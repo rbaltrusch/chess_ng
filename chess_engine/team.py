@@ -4,11 +4,13 @@ Created on Fri Jan  7 14:54:55 2022
 
 @author: richa
 """
-import random
+
 from dataclasses import dataclass
+from typing import Dict
 from typing import List
 
 from .algorithm import ReversibleMove
+from .consts import EARLY_VALUES
 from .piece import King
 from .piece import Piece
 from .piece import Queen
@@ -23,9 +25,14 @@ class Team:
     def __post_init__(self):
         self.king = [x for x in self.pieces if isinstance(x, King)][0]
         self.queen = [x for x in self.pieces if isinstance(x, Queen)][0]
+        self.sort_pieces(EARLY_VALUES)
 
     def __repr__(self):
         return self.representation
+
+    def sort_pieces(self, values: Dict[str, int]):
+        """Sorts the pieces by the specified values dict"""
+        self.pieces.sort(key=lambda x: values.get(x.representation[0]), reverse=True)
 
     def compute_all_moves(self, board):
         """Returns all valid moves for all pieces passed in"""
