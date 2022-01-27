@@ -39,7 +39,8 @@ class Team:
             with ReversibleMove(board, piece, move.position, enemy_pieces):
                 if not self.in_check(board, enemy_pieces):
                     valid_moves.append((piece, move))
-        random.shuffle(valid_moves) #HACK to avoid the same game consistently
+        #random.shuffle(valid_moves) #HACK to avoid the same game consistently
+        valid_moves.sort(key=lambda x: x[1].can_capture, reverse=True)
         return valid_moves
 
     def in_check(self, board, enemy_pieces) -> bool:
