@@ -13,7 +13,7 @@ If you want to submit a pull request for an improvement which is not currently s
 To setup your local development environment, open a terminal and run the following:
 
 ```
-git clone https://github.com/rbaltrusch/chess_engine
+git clone https://github.com/rbaltrusch/chess_ng
 python -m pip install -r requirements.txt
 ```
 
