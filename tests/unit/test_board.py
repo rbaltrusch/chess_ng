@@ -4,12 +4,13 @@ Created on Sat Jan  1 13:28:41 2022
 
 @author: richa
 """
-
 import itertools
+
 import pytest
-from chess_engine.util import convert_str
-from chess_engine.piece import Pawn, Piece
-from chess_engine.board import Board
+from chess_ng.board import Board
+from chess_ng.piece import Pawn
+from chess_ng.piece import Piece
+from chess_ng.util import convert_str
 
 def test_board_len():
     piece = Pawn(direction=-1, position='a2', representation='o1')

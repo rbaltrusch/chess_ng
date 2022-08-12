@@ -20,7 +20,7 @@ def run_tests(args):
     and open the report in the browser.
     """
     script_dir = os.path.abspath(os.path.dirname(__file__))
-    package_path = os.path.join(script_dir, '..', 'chess_engine')
+    package_path = os.path.join(script_dir, '..', 'chess_ng')
 
     timestamp = datetime.datetime.now().strftime('%Y%m%d_%H%M%S')
     report_filename = f'{timestamp}_report.html'

@@ -8,17 +8,17 @@ import logging
 import math
 from typing import List
 
-from chess_engine import move
-from chess_engine.consts import BISHOP
-from chess_engine.consts import KING
-from chess_engine.consts import KNIGHT
-from chess_engine.consts import PAWN
-from chess_engine.consts import QUEEN
-from chess_engine.consts import ROOK
-from chess_engine.util import convert
-from chess_engine.util import convert_str
-from chess_engine.util import is_diagonal
-from chess_engine.util import is_straight
+from chess_ng import move
+from chess_ng.consts import BISHOP
+from chess_ng.consts import KING
+from chess_ng.consts import KNIGHT
+from chess_ng.consts import PAWN
+from chess_ng.consts import QUEEN
+from chess_ng.consts import ROOK
+from chess_ng.util import convert
+from chess_ng.util import convert_str
+from chess_ng.util import is_diagonal
+from chess_ng.util import is_straight
 
 from .move import Move
 

@@ -5,14 +5,14 @@ Created on Sat Jan  1 12:17:30 2022
 @author: richa
 """
 import pytest
-from chess_engine.board import Board
-from chess_engine.piece import Bishop
-from chess_engine.piece import Knight
-from chess_engine.piece import Pawn
-from chess_engine.piece import Queen
-from chess_engine.piece import Rook
-from chess_engine.util import convert
-from chess_engine.util import convert_str
+from chess_ng.board import Board
+from chess_ng.piece import Bishop
+from chess_ng.piece import Knight
+from chess_ng.piece import Pawn
+from chess_ng.piece import Queen
+from chess_ng.piece import Rook
+from chess_ng.util import convert
+from chess_ng.util import convert_str
 
 @pytest.mark.parametrize("direction,position", [(-1, "a2"), (1, "a7")])
 def test_initial_pawn(direction, position):

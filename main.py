@@ -9,20 +9,20 @@ import random
 import time
 from typing import Tuple
 
-from chess_engine import hashing
-from chess_engine.algorithm import evaluate_length
-from chess_engine.algorithm import mating_strategy
-from chess_engine.algorithm import Minimax
-from chess_engine.board import Board
-from chess_engine.consts import BLACK
-from chess_engine.consts import BOARD
-from chess_engine.consts import DIRECTIONS
-from chess_engine.consts import LATE_VALUES
-from chess_engine.consts import MID_VALUES
-from chess_engine.consts import WHITE
-from chess_engine.output import Logger
-from chess_engine.piece import PIECES
-from chess_engine.team import Team
+from chess_ng import hashing
+from chess_ng.algorithm import evaluate_length
+from chess_ng.algorithm import mating_strategy
+from chess_ng.algorithm import Minimax
+from chess_ng.board import Board
+from chess_ng.consts import BLACK
+from chess_ng.consts import BOARD
+from chess_ng.consts import DIRECTIONS
+from chess_ng.consts import LATE_VALUES
+from chess_ng.consts import MID_VALUES
+from chess_ng.consts import WHITE
+from chess_ng.output import Logger
+from chess_ng.piece import PIECES
+from chess_ng.team import Team
 
 def init_pieces() -> Tuple[Team, Team]:
     """Initialises white and black pieces and returns them in a dict"""

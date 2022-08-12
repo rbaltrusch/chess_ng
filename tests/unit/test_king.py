@@ -4,13 +4,12 @@ Created on Sun Jan  2 23:03:05 2022
 
 @author: richa
 """
-
 import pytest
-from chess_engine.util import convert
-from chess_engine.util import convert_str
-from chess_engine.board import Board
-from chess_engine.piece import King
-from chess_engine.piece import Pawn
+from chess_ng.board import Board
+from chess_ng.piece import King
+from chess_ng.piece import Pawn
+from chess_ng.util import convert
+from chess_ng.util import convert_str
 
 @pytest.mark.parametrize("position,expected", [("a1", 3),
                                                ("a2", 5),
