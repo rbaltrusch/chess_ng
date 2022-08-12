@@ -7,7 +7,7 @@ import setuptools
 project_dir = Path(__file__).parent
 
 setuptools.setup(
-    name="chess_engine",
+    name="chess_ng",
     version="1.0.0",
     description="Chess engine including minimax AI",
     long_description=project_dir.joinpath("README.md").read_text(encoding="utf-8"),
