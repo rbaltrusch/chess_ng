@@ -21,7 +21,6 @@ def run_tests(args):
     """
     script_dir = os.path.abspath(os.path.dirname(__file__))
     package_path = os.path.join(script_dir, '..', 'chess_engine')
-    sys.path.append(os.path.join(script_dir, '..'))
 
     timestamp = datetime.datetime.now().strftime('%Y%m%d_%H%M%S')
     report_filename = f'{timestamp}_report.html'
