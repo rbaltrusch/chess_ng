@@ -8,7 +8,7 @@ import itertools
 import re
 from typing import Dict, List, Optional, Tuple
 
-from colorama import Back, Fore
+from colorama import Back, Fore, Style
 
 from chess_ng.consts import WHITE
 from chess_ng.interfaces import Piece
@@ -49,7 +49,7 @@ class Board:
                     representation = "  "
 
                 square = re.sub("[12]", " ", representation)
-                print(background + foreground + square, end="")
+                print(background + foreground + square, end="" + Style.RESET_ALL)
             print()
         return ""
 
