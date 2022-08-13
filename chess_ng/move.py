@@ -6,8 +6,8 @@ Created on Mon Feb  8 12:56:04 2021
 """
 import itertools
 from dataclasses import dataclass
-from typing import List
-from typing import Tuple
+from typing import List, Tuple
+
 
 @dataclass
 class Move:
@@ -20,12 +20,13 @@ class Move:
         return hash(self.position)
 
     def __iter__(self):
-        #pylint: disable=invalid-name
+        # pylint: disable=invalid-name
         for x in self.position:
             yield x
 
     def __getitem__(self, key):
         return self.position[key]
+
 
 # pylint: disable=invalid-name
 @dataclass
@@ -51,7 +52,7 @@ class LineMove:
 
         moves = []
 
-        #forward
+        # forward
         for x in range(current_x + 1, board.size):
             square = board[x, y]
             if square is None:
@@ -61,7 +62,7 @@ class LineMove:
             if square is not None:
                 break
 
-        #backward
+        # backward
         for x in range(current_x - 1, -1, -1):
             square = board[x, y]
             if square is None:
@@ -104,6 +105,7 @@ class LineMove:
             return forward_moves if self.direction == -1 else backward_moves
         return forward_moves + backward_moves
 
+
 # pylint: disable=too-few-public-methods
 class BishopMove:
     """Moves diagonally to either side of the board, backwards and forwards"""
@@ -127,6 +129,7 @@ class BishopMove:
                 pos = (pos[0] + x_dir, pos[1] + y_dir)
         return moves
 
+
 class InitialPawnMove:
     """Moves 2 spaces forward"""
 
@@ -139,10 +142,13 @@ class InitialPawnMove:
             return []
         x, y = piece.position
         dir_ = self.direction
+
         def empty(y_):
             pos = (x, y + y_ * dir_)
             return board.is_empty_at(pos) and board.is_on_board(pos)
+
         return [Move((x, y + 2 * dir_))] if empty(1) and empty(2) else []
+
 
 class KingMove:
     """Moves 1 space in any direction"""
@@ -163,6 +169,7 @@ class KingMove:
                 moves.append(Move(pos, can_capture=True))
         return moves
 
+
 class PawnMove:
     """Moves 1 space forward"""
 
@@ -177,6 +184,7 @@ class PawnMove:
             return [Move(pos)]
         return []
 
+
 class PawnCapture:
     """Moves 1 space forward diagonally and needs to capture"""
 
@@ -187,8 +195,12 @@ class PawnCapture:
         """Computes all valid moves that can be made from the passed position"""
         x, y = piece.position
         moves = ((x + 1, y + self.direction), (x - 1, y + self.direction))
-        return [Move(x, can_capture=True) for x in filter(board.is_on_board, moves)
-                if not board.is_empty_at(x) and board.is_enemy(x, piece.team)]
+        return [
+            Move(x, can_capture=True)
+            for x in filter(board.is_on_board, moves)
+            if not board.is_empty_at(x) and board.is_enemy(x, piece.team)
+        ]
+
 
 class EnPassantMove:
     """Pawn capture but with a pawn that already passed"""
@@ -205,8 +217,11 @@ class RookMove(LineMove):
 class KnightMove:
     """Knight move"""
 
-    INDICES = [(x, y) for x, y in itertools.product((1, 2, -1, -2), repeat=2)
-                   if abs(x) != abs(y)]
+    INDICES = [
+        (x, y)
+        for x, y in itertools.product((1, 2, -1, -2), repeat=2)
+        if abs(x) != abs(y)
+    ]
 
     @classmethod
     def compute_valid_moves(cls, board, piece) -> List[Move]:

@@ -9,22 +9,13 @@ import math
 from typing import List
 
 from chess_ng import move
-from chess_ng.consts import BISHOP
-from chess_ng.consts import KING
-from chess_ng.consts import KNIGHT
-from chess_ng.consts import PAWN
-from chess_ng.consts import QUEEN
-from chess_ng.consts import ROOK
-from chess_ng.util import convert
-from chess_ng.util import convert_str
-from chess_ng.util import is_diagonal
-from chess_ng.util import is_straight
-
-from .move import Move
+from chess_ng.consts import BISHOP, KING, KNIGHT, PAWN, QUEEN, ROOK
+from chess_ng.move import Move
+from chess_ng.util import convert, convert_str, is_diagonal, is_straight
 
 TURN_COUNTER = 0.0
 
-#pylint: disable=invalid-name
+# pylint: disable=invalid-name
 class Piece:
     """Piece class. Needs to be subclassed by the various chess pieces"""
 
@@ -37,34 +28,36 @@ class Piece:
         self.position_history = []
 
     def __repr__(self):
-        return f'{self.__class__.__name__}({convert(self.position)})'
+        return f"{self.__class__.__name__}({convert(self.position)})"
 
     def __hash__(self):
         return hash((self.position, self.representation))
 
-    def update(self, board): #pylint: disable=no-self-use
+    def update(self, board):  # pylint: disable=no-self-use
         """Update piece"""
 
-    def increase_search_depth(self, search_depth): #pylint: disable=no-self-use
+    def increase_search_depth(self, search_depth):  # pylint: disable=no-self-use
         """Does nothing to search depth"""
         return search_depth
 
     def compute_valid_moves(self, board) -> List[Move]:
         """Returns a list of squares that the piece can move to or capture at"""
-        return [pos for move in self.moves for pos in move.compute_valid_moves(board, self)]
+        return [
+            pos for move in self.moves for pos in move.compute_valid_moves(board, self)
+        ]
 
     def move_to(self, position, log=True) -> None:
         """Moves the piece to the specified position and adds it to the position history"""
-        #pylint: disable=logging-fstring-interpolation
+        # pylint: disable=logging-fstring-interpolation
         pos_old = convert(self.position)
         self.position = position
         self.position_history.append(position)
         if log:
-            global TURN_COUNTER #pylint: disable=global-statement
+            global TURN_COUNTER  # pylint: disable=global-statement
             TURN_COUNTER += 0.5
-            logger = logging.getLogger('game.log')
-            move_ = f'{self.representation} from {pos_old} to {convert(position)}'
-            logger.info(f'Turn {math.ceil(TURN_COUNTER)}: Team {self.team}: {move_}')
+            logger = logging.getLogger("game.log")
+            move_ = f"{self.representation} from {pos_old} to {convert(position)}"
+            logger.info(f"Turn {math.ceil(TURN_COUNTER)}: Team {self.team}: {move_}")
 
     def can_capture_at(self, board, position) -> bool:
         """Returns true if this piece can move to the specified position.
@@ -72,13 +65,16 @@ class Piece:
         """
         return position in (move.position for move in self.compute_valid_moves(board))
 
+
 class Pawn(Piece):
     """Pawn class. Contains all the pawn moves"""
 
     def __init__(self, direction, position, representation):
-        self._unpromoted_moves = [move.InitialPawnMove(direction),
-                 move.PawnMove(direction),
-                 move.PawnCapture(direction)]
+        self._unpromoted_moves = [
+            move.InitialPawnMove(direction),
+            move.PawnMove(direction),
+            move.PawnCapture(direction),
+        ]
         self._promoted_moves = [move.RookMove(), move.BishopMove()]
         self.promoted = False
         self.direction = direction
@@ -94,7 +90,7 @@ class Pawn(Piece):
 
     def can_capture_at(self, board, position) -> bool:
         """Returns true if this piece can move to the specified position"""
-        #optimization: return False if more than one square away
+        # optimization: return False if more than one square away
         if not self.promoted and abs(position[1] - self.position[1]) > 1:
             return False
         return super().can_capture_at(board, position)
@@ -111,11 +107,12 @@ class Pawn(Piece):
     @property
     def representation(self):
         """Representation getter, depends on the promoted state"""
-        return f'{QUEEN}{self.team}' if self.promoted else f'{PAWN}{self.team}'
+        return f"{QUEEN}{self.team}" if self.promoted else f"{PAWN}{self.team}"
 
     @representation.setter
     def representation(self, value):
         pass
+
 
 class Knight(Piece):
     """Knight class. Contains all the knight moves"""
@@ -128,10 +125,11 @@ class Knight(Piece):
         """Returns true if this piece can move to the specified position"""
         x1, y1 = position
         x2, y2 = self.position
-        #optimization: return False if not L-shaped 2 and 1 squares away
+        # optimization: return False if not L-shaped 2 and 1 squares away
         if {abs(x1 - x2), abs(y1 - y2)} != {1, 2}:
             return False
         return super().can_capture_at(board, position)
+
 
 class Bishop(Piece):
     """Bishop class. Contains all the bishop moves"""
@@ -142,10 +140,11 @@ class Bishop(Piece):
 
     def can_capture_at(self, board, position) -> bool:
         """Returns true if this piece can move to the specified position"""
-        #optimization: return False if not on same diagonal
+        # optimization: return False if not on same diagonal
         if not is_diagonal(position, self.position):
             return False
         return super().can_capture_at(board, position)
+
 
 class Rook(Piece):
     """Rook class. Contains all the rook moves"""
@@ -156,10 +155,11 @@ class Rook(Piece):
 
     def can_capture_at(self, board, position) -> bool:
         """Returns true if this piece can move to the specified position"""
-        #optimization: return False if not horizontally or vertically aligned
+        # optimization: return False if not horizontally or vertically aligned
         if not is_straight(position, self.position):
             return False
         return super().can_capture_at(board, position)
+
 
 class Queen(Piece):
     """Queen class. Contains all the queen moves"""
@@ -177,12 +177,14 @@ class Queen(Piece):
 
     def can_capture_at(self, board, position) -> bool:
         """Returns true if this piece can move to the specified position"""
-        #optimization: return False if not horizontally or vertically aligned
-        #and not same diagonal
-        if (not is_straight(position, self.position)
-            and not is_diagonal(position, self.position)):
+        # optimization: return False if not horizontally or vertically aligned
+        # and not same diagonal
+        if not is_straight(position, self.position) and not is_diagonal(
+            position, self.position
+        ):
             return False
         return super().can_capture_at(board, position)
+
 
 class King(Piece):
     """King class. Contains all the king moves"""
@@ -195,14 +197,17 @@ class King(Piece):
         """Returns true if this piece can move to the specified position"""
         x1, y1 = position
         x2, y2 = self.position
-        #optimization: return False if more than one square away
+        # optimization: return False if more than one square away
         if abs(x1 - x2) > 1 or abs(y1 - y2) > 1:
             return False
         return super().can_capture_at(board, position)
 
-PIECES = {PAWN: Pawn,
-          KNIGHT: Knight,
-          BISHOP: Bishop,
-          ROOK: Rook,
-          QUEEN: Queen,
-          KING: King}
+
+PIECES = {
+    PAWN: Pawn,
+    KNIGHT: Knight,
+    BISHOP: Bishop,
+    ROOK: Rook,
+    QUEEN: Queen,
+    KING: King,
+}

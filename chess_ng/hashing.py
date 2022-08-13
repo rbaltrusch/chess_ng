@@ -7,6 +7,7 @@ Created on Sat Jan 22 14:53:45 2022
 import math
 from typing import Dict
 
+
 def get_hash_values(pieces) -> Dict[str, int]:
     """Returns a hash value dict that looks up piece representations and returns
     a unique integer.
@@ -14,9 +15,10 @@ def get_hash_values(pieces) -> Dict[str, int]:
     representations = set(piece.representation for piece in pieces)
     return {representation: i for i, representation in enumerate(representations, 1)}
 
+
 def compute_hash(board, hash_values) -> int:
     """Computes a new hash from the board the specified hash_values lookup table"""
-    #pylint: disable=invalid-name
+    # pylint: disable=invalid-name
     if not hash_values:
         return 0
 
@@ -34,11 +36,12 @@ def compute_hash(board, hash_values) -> int:
             hash_ ^= num
     return hash_
 
+
 def update_hash(hash_, board, hash_values, changed_positions) -> int:
     """Updates the Zobrist hash by xor gating. 100 times fasteer than generating new hash"""
-    #pylint: disable=invalid-name
+    # pylint: disable=invalid-name
     exponent = math.ceil(math.log(len(hash_values), 2))
-    max_ = 2 ** exponent - 1
+    max_ = 2**exponent - 1
     for x, y in changed_positions:
         counter = y * board.size + x
         piece = board[x, y]

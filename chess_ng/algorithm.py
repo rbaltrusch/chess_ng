@@ -6,16 +6,14 @@ Created on Fri Jan  7 14:33:33 2022
 """
 import math
 from dataclasses import dataclass
-from typing import Callable
-from typing import Dict
-from typing import List
-from typing import Tuple
+from typing import Callable, Dict, List, Tuple
 
 import numpy as np
 
-from .board import Board
-from .hashing import compute_hash
-from .piece import Piece
+from chess_ng.board import Board
+from chess_ng.hashing import compute_hash
+from chess_ng.piece import Piece
+
 
 @dataclass
 class ReversibleMove:
@@ -57,27 +55,35 @@ def evaluate_length(board, team, enemy):
     """Evaluates the board state based on the amount of moves allied pieces
     and enemy pieces can make.
     """
-    #HACK: using compute_all_moves instead of compute_valid_moves to save computation time
+    # HACK: using compute_all_moves instead of compute_valid_moves to save computation time
     return len(team.compute_all_moves(board)) - len(enemy.compute_all_moves(board))
+
 
 def evaluate_length_with_captures(board, team, enemy):
     """Evaluates the board state based on the amount of moves allied pieces
     and enemy pieces can make.
     """
-    #HACK: using compute_all_moves instead of compute_valid_moves to save computation time
-    ally_moves = sum([2 if move.can_capture else 1 for _, move in team.compute_all_moves(board)])
-    enemy_moves = sum([3 if move.can_capture else 1 for _, move in enemy.compute_all_moves(board)])
+    # HACK: using compute_all_moves instead of compute_valid_moves to save computation time
+    ally_moves = sum(
+        [2 if move.can_capture else 1 for _, move in team.compute_all_moves(board)]
+    )
+    enemy_moves = sum(
+        [3 if move.can_capture else 1 for _, move in enemy.compute_all_moves(board)]
+    )
     return (ally_moves - 1) / enemy_moves if enemy_moves else math.inf
+
 
 def mating_strategy(board, team, enemy):
     """Incentivizes disabling the enemy kings movements while keeping own movement high"""
-    return (len(team.compute_valid_moves(board, enemy.pieces))
-            - len(enemy.king.compute_valid_moves(board)))
+    return len(team.compute_valid_moves(board, enemy.pieces)) - len(
+        enemy.king.compute_valid_moves(board)
+    )
+
 
 def evaluate_distance(board, team, enemy):
     """Evaluates board state based on the closeness to the enemy king"""
-    #HACK: using compute_all_moves instead of compute_valid_moves to save computation time
-    #pylint: disable=invalid-name
+    # HACK: using compute_all_moves instead of compute_valid_moves to save computation time
+    # pylint: disable=invalid-name
     def inverse_distance(point1, point2):
         x1, y1 = point1
         x2, y2 = point2
@@ -85,22 +91,31 @@ def evaluate_distance(board, team, enemy):
         if value == 0:
             return 1
         return 1 / value
-    sum_ally = sum(inverse_distance(enemy.king.position, move.position)
-                   for _, move in team.compute_all_moves(board))
-    sum_enemy = sum(inverse_distance(team.king.position, move.position)
-                    for _, move in enemy.compute_all_moves(board))
+
+    sum_ally = sum(
+        inverse_distance(enemy.king.position, move.position)
+        for _, move in team.compute_all_moves(board)
+    )
+    sum_enemy = sum(
+        inverse_distance(team.king.position, move.position)
+        for _, move in enemy.compute_all_moves(board)
+    )
     return sum_ally - sum_enemy
+
 
 def evaluate_distance_np(board, team, enemy):
     """Evaluates board state based on the closeness to the enemy king"""
-    #seems to lead to very wonky games...
+    # seems to lead to very wonky games...
     ally_moves = np.array([move.position for _, move in team.compute_all_moves(board)])
-    enemy_moves = np.array([move.position for _, move in enemy.compute_all_moves(board)])
+    enemy_moves = np.array(
+        [move.position for _, move in enemy.compute_all_moves(board)]
+    )
     king_position = np.array([team.king.position])
     enemy_king_position = np.array([enemy.king.position])
     ally_distances = np.linalg.norm(enemy_king_position - ally_moves)
     enemy_distances = np.linalg.norm(king_position - enemy_moves)
     return enemy_distances - ally_distances
+
 
 @dataclass
 class Minimax:
@@ -112,7 +127,7 @@ class Minimax:
     def __post_init__(self):
         self.board_hashes = {}
 
-    #pylint: disable=too-many-arguments,too-many-locals,too-many-branches #for now...
+    # pylint: disable=too-many-arguments,too-many-locals,too-many-branches #for now...
     def run(self, board, team, enemy, depth, alpha, beta, maximizing_player):
         """Minimax algorithm with alpha-beta pruning.
         At depth=3, computation speed is still relatively fast.
@@ -122,7 +137,7 @@ class Minimax:
         if board.is_draw_by_repetition():
             return 0, None
 
-        if depth == 0: #or game over
+        if depth == 0:  # or game over
             evaluation = self.evaluation_function(board, team, enemy)
             hash_ = compute_hash(board, self.hash_values)
             self.board_hashes[maximizing_player, hash_] = evaluation
@@ -139,8 +154,9 @@ class Minimax:
                 eval_position = self.board_hashes.get((maximizing_player, hash_))
                 if eval_position is None:
                     with ReversibleMove(board, piece, move.position, enemy.pieces):
-                        eval_position = self.run(board, team, enemy,
-                                                 search_depth, alpha, beta, False)[0]
+                        eval_position = self.run(
+                            board, team, enemy, search_depth, alpha, beta, False
+                        )[0]
 
                 if eval_position > max_eval or best_move is None:
                     best_move = (piece, move)
@@ -162,8 +178,9 @@ class Minimax:
             eval_position = self.board_hashes.get((maximizing_player, hash_))
             if eval_position is None:
                 with ReversibleMove(board, piece, move.position, team.pieces):
-                    eval_position = self.run(board, team, enemy,
-                                             search_depth, alpha, beta, True)[0]
+                    eval_position = self.run(
+                        board, team, enemy, search_depth, alpha, beta, True
+                    )[0]
 
             if eval_position < min_evaluation or min_move is None:
                 min_move = (piece, move.position)

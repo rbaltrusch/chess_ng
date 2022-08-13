@@ -6,28 +6,30 @@ Created on Mon Feb  8 15:19:32 2021
 """
 import itertools
 import re
-from typing import List
-from typing import Tuple
-from typing import Union
+from typing import List, Tuple, Union
 
-from colorama import Back
-from colorama import Fore
+from colorama import Back, Fore
 
-from .consts import WHITE
-from .piece import Piece
+from chess_ng.consts import WHITE
+from chess_ng.piece import Piece
+
 
 class Board:
     """Board class. Contains all the pieces on the chess board"""
 
-    def __init__(self, pieces: List[Piece] = None, size = 8):
-        self._pieces = {piece.position: piece for piece in pieces} if pieces is not None else {}
-        self._squares = {pos: self._pieces.get(pos) for pos in
-                         itertools.product(range(size), repeat=2)}
+    def __init__(self, pieces: List[Piece] = None, size=8):
+        self._pieces = (
+            {piece.position: piece for piece in pieces} if pieces is not None else {}
+        )
+        self._squares = {
+            pos: self._pieces.get(pos)
+            for pos in itertools.product(range(size), repeat=2)
+        }
         self.size = size
         self.move_history: List[Tuple[Piece, Tuple[int, int]]] = []
 
     def __repr__(self):
-        #pylint: disable=invalid-name
+        # pylint: disable=invalid-name
         for y in range(self.size):
             for x in range(self.size):
                 if y % 2:
@@ -37,19 +39,21 @@ class Board:
 
                 piece = self[x, y]
                 if piece is not None:
-                    foreground = Fore.GREEN if WHITE in piece.representation else Fore.RED
+                    foreground = (
+                        Fore.GREEN if WHITE in piece.representation else Fore.RED
+                    )
                     representation = piece.representation
                 else:
                     foreground = Fore.LIGHTBLACK_EX
-                    representation = '  '
+                    representation = "  "
 
-                square = re.sub('[12]', ' ', representation)
-                print(background + foreground + square, end='')
+                square = re.sub("[12]", " ", representation)
+                print(background + foreground + square, end="")
             print()
-        return ''
+        return ""
 
     def __iter__(self):
-        #pylint: disable=invalid-name
+        # pylint: disable=invalid-name
         for y in range(self.size):
             yield [self[x, y] for x in range(self.size)]
 
@@ -86,7 +90,7 @@ class Board:
             self._squares[position] = None
             piece.captured = True
             if log:
-                print(f'Captured {piece}')
+                print(f"Captured {piece}")
             return piece
         return None
 

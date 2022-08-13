@@ -10,7 +10,7 @@ import os
 import sys
 
 
-class Logger():
+class Logger:
     """Logger context manager"""
 
     def __init__(self, folder, filename):
@@ -28,13 +28,13 @@ class Logger():
         logging.shutdown()
 
     def _init_logger(self):
-        logging.basicConfig(format='%(message)s', level=logging.DEBUG)
-        self.logger = logging.getLogger('game.log')
+        logging.basicConfig(format="%(message)s", level=logging.DEBUG)
+        self.logger = logging.getLogger("game.log")
         self.logger.handlers.clear()
 
-        now = datetime.datetime.now().strftime('%y%m%d_%H%M%S')
-        filepath = os.path.join(self.folder, f'{now}_game.log')
-        file_handler = logging.FileHandler(filepath, mode='w')
+        now = datetime.datetime.now().strftime("%y%m%d_%H%M%S")
+        filepath = os.path.join(self.folder, f"{now}_game.log")
+        file_handler = logging.FileHandler(filepath, mode="w")
         file_handler.setLevel(logging.DEBUG)
         self.logger.addHandler(file_handler)
 
