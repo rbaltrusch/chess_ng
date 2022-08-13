@@ -5,10 +5,12 @@ Created on Fri Jan  7 14:54:55 2022
 @author: richa
 """
 from dataclasses import dataclass
-from typing import Dict, List
+from typing import Dict, List, Tuple
 
 from chess_ng.algorithm import ReversibleMove
+from chess_ng.board import Board
 from chess_ng.consts import EARLY_VALUES
+from chess_ng.move import Move
 from chess_ng.piece import King, Piece, Queen
 
 
@@ -29,9 +31,9 @@ class Team:
 
     def sort_pieces(self, values: Dict[str, int]):
         """Sorts the pieces by the specified values dict"""
-        self.pieces.sort(key=lambda x: values.get(x.representation[0]), reverse=True)
+        self.pieces.sort(key=lambda x: values[x.representation[0]], reverse=True)
 
-    def compute_all_moves(self, board):
+    def compute_all_moves(self, board: Board) -> List[Tuple[Piece, Move]]:
         """Returns all valid moves for all pieces passed in"""
         return [
             (piece, move)
@@ -39,9 +41,11 @@ class Team:
             for move in piece.compute_valid_moves(board)
         ]
 
-    def compute_valid_moves(self, board, enemy_pieces):
+    def compute_valid_moves(
+        self, board: Board, enemy_pieces: List[Piece]
+    ) -> List[Tuple[Piece, Move]]:
         """Returns moves not resulting in a check of the allied king"""
-        valid_moves = []
+        valid_moves: List[Tuple[Piece, Move]] = []
         for piece, move in self.compute_all_moves(board):
             with ReversibleMove(board, piece, move.position, enemy_pieces):
                 if not self.in_check(board, enemy_pieces):
@@ -50,7 +54,7 @@ class Team:
         valid_moves.sort(key=lambda x: x[1].can_capture, reverse=True)
         return valid_moves
 
-    def in_check(self, board, enemy_pieces) -> bool:
+    def in_check(self, board: Board, enemy_pieces: List[Piece]) -> bool:
         """Returns True if any enemy pieces can capture at the specified position"""
         # optimization: True for all truthy elements.
         # Directly checking capture state would be slower

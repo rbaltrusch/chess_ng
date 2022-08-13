@@ -13,10 +13,10 @@ import sys
 class Logger:
     """Logger context manager"""
 
-    def __init__(self, folder, filename):
+    def __init__(self, folder: str, filename: str):
         self.folder = folder
         self.filename = filename
-        self.logger = None
+        self.logger: logging.Logger = None  # type: ignore
 
     def __enter__(self):
         self._init_folder()

@@ -6,13 +6,32 @@ Created on Fri Jan  7 14:33:33 2022
 """
 import math
 from dataclasses import dataclass
-from typing import Callable, Dict, List, Tuple
+from typing import Callable, Dict, List, Optional, Protocol, Tuple, Union
 
 import numpy as np
 
 from chess_ng.board import Board
 from chess_ng.hashing import compute_hash
-from chess_ng.piece import Piece
+from chess_ng.move import Move
+from chess_ng.piece import King, Piece
+
+Number = Union[int, float]
+
+
+class _TeamInterface(Protocol):
+
+    king: King
+    pieces: List[Piece]
+
+    def compute_all_moves(  # pylint: disable=missing-function-docstring
+        self, board: Board
+    ) -> List[Tuple[Piece, Move]]:
+        ...
+
+    def compute_valid_moves(  # pylint: disable=missing-function-docstring
+        self, board: Board, enemy_pieces: List[Piece]
+    ) -> List[Tuple[Piece, Move]]:
+        ...
 
 
 @dataclass
@@ -25,8 +44,8 @@ class ReversibleMove:
     enemy_pieces: List[Piece]
 
     def __post_init__(self):
-        self.original_position = None
-        self.captured_piece = None
+        self.original_position: Tuple[int, int] = None  # type: ignore
+        self.captured_piece: Optional[Piece] = None
 
     def __enter__(self):
         self.original_position = self.piece.position
@@ -51,7 +70,7 @@ class ReversibleMove:
             self.enemy_pieces.append(self.captured_piece)
 
 
-def evaluate_length(board, team, enemy):
+def evaluate_length(board: Board, team: _TeamInterface, enemy: _TeamInterface):
     """Evaluates the board state based on the amount of moves allied pieces
     and enemy pieces can make.
     """
@@ -59,32 +78,34 @@ def evaluate_length(board, team, enemy):
     return len(team.compute_all_moves(board)) - len(enemy.compute_all_moves(board))
 
 
-def evaluate_length_with_captures(board, team, enemy):
+def evaluate_length_with_captures(
+    board: Board, team: _TeamInterface, enemy: _TeamInterface
+):
     """Evaluates the board state based on the amount of moves allied pieces
     and enemy pieces can make.
     """
     # HACK: using compute_all_moves instead of compute_valid_moves to save computation time
     ally_moves = sum(
-        [2 if move.can_capture else 1 for _, move in team.compute_all_moves(board)]
+        2 if move.can_capture else 1 for _, move in team.compute_all_moves(board)
     )
     enemy_moves = sum(
-        [3 if move.can_capture else 1 for _, move in enemy.compute_all_moves(board)]
+        3 if move.can_capture else 1 for _, move in enemy.compute_all_moves(board)
     )
     return (ally_moves - 1) / enemy_moves if enemy_moves else math.inf
 
 
-def mating_strategy(board, team, enemy):
+def mating_strategy(board: Board, team: _TeamInterface, enemy: _TeamInterface):
     """Incentivizes disabling the enemy kings movements while keeping own movement high"""
     return len(team.compute_valid_moves(board, enemy.pieces)) - len(
         enemy.king.compute_valid_moves(board)
     )
 
 
-def evaluate_distance(board, team, enemy):
+def evaluate_distance(board: Board, team: _TeamInterface, enemy: _TeamInterface):
     """Evaluates board state based on the closeness to the enemy king"""
     # HACK: using compute_all_moves instead of compute_valid_moves to save computation time
     # pylint: disable=invalid-name
-    def inverse_distance(point1, point2):
+    def inverse_distance(point1: Tuple[int, int], point2: Tuple[int, int]):
         x1, y1 = point1
         x2, y2 = point2
         value = math.sqrt((x1 - x2) ** 2 + abs(y1 - y2) ** 2)
@@ -103,17 +124,19 @@ def evaluate_distance(board, team, enemy):
     return sum_ally - sum_enemy
 
 
-def evaluate_distance_np(board, team, enemy):
+def evaluate_distance_np(
+    board: Board, team: _TeamInterface, enemy: _TeamInterface
+) -> float:
     """Evaluates board state based on the closeness to the enemy king"""
     # seems to lead to very wonky games...
-    ally_moves = np.array([move.position for _, move in team.compute_all_moves(board)])
-    enemy_moves = np.array(
+    ally_moves = np.array([move.position for _, move in team.compute_all_moves(board)])  # type: ignore
+    enemy_moves = np.array(  # type: ignore
         [move.position for _, move in enemy.compute_all_moves(board)]
     )
-    king_position = np.array([team.king.position])
-    enemy_king_position = np.array([enemy.king.position])
-    ally_distances = np.linalg.norm(enemy_king_position - ally_moves)
-    enemy_distances = np.linalg.norm(king_position - enemy_moves)
+    king_position = np.array([team.king.position])  # type: ignore
+    enemy_king_position = np.array([enemy.king.position])  # type: ignore
+    ally_distances: float = np.linalg.norm(enemy_king_position - ally_moves)  # type: ignore
+    enemy_distances: float = np.linalg.norm(king_position - enemy_moves)  # type: ignore
     return enemy_distances - ally_distances
 
 
@@ -121,14 +144,23 @@ def evaluate_distance_np(board, team, enemy):
 class Minimax:
     """Minimax algorithm class with alpha-beta pruning and customizable evaluation"""
 
-    evaluation_function: Callable
-    hash_values: Dict
+    evaluation_function: Callable[[Board, _TeamInterface, _TeamInterface], float]
+    hash_values: Dict[str, int]
 
     def __post_init__(self):
-        self.board_hashes = {}
+        self.board_hashes: Dict[Tuple[bool, int], Number] = {}
 
     # pylint: disable=too-many-arguments,too-many-locals,too-many-branches #for now...
-    def run(self, board, team, enemy, depth, alpha, beta, maximizing_player):
+    def run(
+        self,
+        board: Board,
+        team: _TeamInterface,
+        enemy: _TeamInterface,
+        depth: int,
+        alpha: Number,
+        beta: Number,
+        maximizing_player: bool,
+    ) -> Tuple[Number, Optional[Tuple[Piece, Move]]]:
         """Minimax algorithm with alpha-beta pruning.
         At depth=3, computation speed is still relatively fast.
         At depth=4, it slows down considerably, but does make much better moves.
@@ -183,7 +215,7 @@ class Minimax:
                     )[0]
 
             if eval_position < min_evaluation or min_move is None:
-                min_move = (piece, move.position)
+                min_move = (piece, move)
             min_evaluation = min(min_evaluation, eval_position)
             beta = min(beta, eval_position)
             if eval_position <= alpha:

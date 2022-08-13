@@ -4,30 +4,31 @@ Created on Mon Feb  8 13:36:04 2021
 
 @author: Korean_Crimson
 """
+import logging
 import math
 import random
 import time
-from typing import Tuple
+from typing import Dict, List, Sequence, Tuple
 
 from chess_ng import hashing
 from chess_ng.algorithm import Minimax, evaluate_length, mating_strategy
 from chess_ng.board import Board
 from chess_ng.consts import BLACK, BOARD, DIRECTIONS, LATE_VALUES, MID_VALUES, WHITE
 from chess_ng.output import Logger
-from chess_ng.piece import PIECES
+from chess_ng.piece import PIECES, Piece
 from chess_ng.team import Team
 
 
 def init_pieces() -> Tuple[Team, Team]:
     """Initialises white and black pieces and returns them in a dict"""
     # pylint: disable=invalid-name
-    pieces = {WHITE: [], BLACK: []}
+    pieces: Dict[str, List[Piece]] = {WHITE: [], BLACK: []}
     for y, row in enumerate(BOARD):
         for x, square in enumerate(row):
             if square is not None:
                 piece_type, team = square
                 piece_class = PIECES[piece_type]
-                direction = DIRECTIONS[team]
+                direction = DIRECTIONS[team]  # type: ignore
                 new_piece = piece_class(
                     direction, position=(x, y), representation=square
                 )
@@ -37,14 +38,14 @@ def init_pieces() -> Tuple[Team, Team]:
 
 # pylint: disable=too-many-arguments,too-many-locals,too-many-branches
 def game(
-    board,
-    teams,
-    hash_values,
-    logger,
-    depth=2,
-    moves=50,
-    resign_threshold=-50,
-    mating_threshold=10,
+    board: Board,
+    teams: Sequence[Team],
+    hash_values: Dict[str, int],
+    logger: logging.Logger,
+    depth: int = 2,
+    moves: int = 50,
+    resign_threshold: int = -50,
+    mating_threshold: int = 10,
 ):
     """Chess game function"""
     logger.info(f"Depth: {depth}")
@@ -60,9 +61,8 @@ def game(
         for team, enemy in [teams, teams[::-1]]:
             initial_time = time.time()
             is_in_check = team.in_check(board, enemy.pieces)
-            moves = team.compute_valid_moves(board, enemy.pieces)
 
-            if not moves:
+            if not team.compute_valid_moves(board, enemy.pieces):
                 if is_in_check:
                     logger.info(f"Checkmated team {team}. Team {enemy} wins.")
                 else:
@@ -78,7 +78,7 @@ def game(
 
             team.queen.depth_counter = 0
             enemy.queen.depth_counter = 0
-            rating, (piece, move) = minimax.run(
+            rating, move_result = minimax.run(
                 board,
                 team,
                 enemy,
@@ -87,6 +87,12 @@ def game(
                 beta=math.inf,
                 maximizing_player=True,
             )
+
+            if move_result is None:
+                logger.info("No move found")
+                return
+            piece, move = move_result
+
             print(f"Rating: {rating}")
             if rating < resign_threshold:
                 logger.info(f"Team {team} resigned. Team {enemy} wins.")

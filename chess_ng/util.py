@@ -4,9 +4,34 @@ Created on Mon Feb  8 20:35:48 2021
 
 @author: Korean_Crimson
 """
+from dataclasses import dataclass
 from typing import Tuple
 
 X_POSITIONS = dict(zip(range(8), "abcdefgh"))
+
+
+class InvalidPositionException(Exception):
+    """Exception to be raised for invalid chess square string positions."""
+
+
+@dataclass
+class Move:
+    """Moves class, takes a position that can be moved to and whether it is a capture or not"""
+
+    position: Tuple[int, int]
+    can_capture: bool = False
+
+    def __hash__(self):
+        return hash(self.position)
+
+    def __iter__(self):
+        # pylint: disable=invalid-name
+        for x in self.position:
+            yield x
+
+    def __getitem__(self, key: int):
+        return self.position[key]
+
 
 # pylint: disable=invalid-name
 def convert(position: Tuple[int, int]) -> str:
@@ -22,11 +47,10 @@ def convert_str(string: str) -> Tuple[int, int]:
     Example: a1 -> (0, 7).
     """
     y = 8 - int(string[-1])
-    for k, v in X_POSITIONS.items():
+    for x, v in X_POSITIONS.items():
         if v == string[0]:
-            x = k
-            break
-    return (x, y)
+            return (x, y)
+    raise InvalidPositionException("Invalid string chess board position specified!")
 
 
 def is_diagonal(position1: Tuple[int, int], position2: Tuple[int, int]):
