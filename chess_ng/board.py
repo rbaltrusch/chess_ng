@@ -6,6 +6,7 @@ Created on Mon Feb  8 15:19:32 2021
 """
 import itertools
 import re
+from functools import lru_cache
 from typing import Dict, List, Optional, Tuple
 
 from colorama import Back, Fore, Style
@@ -134,6 +135,8 @@ class BitBoard:
     """Board implemented with bitfields"""
 
     _BITSIZE = 4
+    _PIECE_BITMASK = 2**_BITSIZE - 1
+    _TEAM_BITMASK = 2 ** (_BITSIZE - 1)
     _BIT_REPRESENTATIONS = {
         None: 0,
         "o": 1,
@@ -147,14 +150,15 @@ class BitBoard:
     def __init__(self, pieces: List[Piece], size: int = 8):
         self.move_history: List[Tuple[Piece, Tuple[int, int]]] = []
         self.size = size
-        self._bit_representation: int = 0
+        self.bit_representation: int = 0
         self._init_bit_representation(pieces)
+        self._squares = set(itertools.product(range(self.size), range(self.size)))
 
     def __repr__(self):
         # pylint: disable=invalid-name
         reverse_dict = {v: k for k, v in self._BIT_REPRESENTATIONS.items()}
-        piece_bitmask = 2 ** (self._BITSIZE - 1) - 1
-        team_bitmask = 2 ** (self._BITSIZE - 1)
+        piece_bitmask = self._TEAM_BITMASK - 1  # strips team bit from piece info
+        team_bitmask = self._TEAM_BITMASK
         team_bitshift = self._BITSIZE - 1
 
         for y in range(self.size):
@@ -168,9 +172,8 @@ class BitBoard:
                 if piece is not None:
                     piece_repr = reverse_dict[piece & piece_bitmask]
                     team_repr = (piece & team_bitmask) >> team_bitshift
-                    repr_ = f"{piece_repr}{team_repr + 1}"
-                    foreground = Fore.GREEN if WHITE in repr_ else Fore.RED
-                    representation = repr_
+                    representation = f"{piece_repr}{team_repr + 1}"
+                    foreground = Fore.GREEN if WHITE in representation else Fore.RED
                 else:
                     foreground = Fore.LIGHTBLACK_EX
                     representation = "  "
@@ -186,30 +189,31 @@ class BitBoard:
             yield [self[x, y] for x in range(self.size)]
 
     def __getitem__(self, value: Tuple[int, int]) -> Optional[int]:
-        piece_bitmask = 2**self._BITSIZE - 1
-        bitshift = self._convert_index(value) * self._BITSIZE
-        representation = (self._bit_representation >> bitshift) & piece_bitmask
+        representation = (
+            self.bit_representation >> self._convert_index(value)
+        ) & self._PIECE_BITMASK
         return None if representation == 0 else representation
 
     def __setitem__(self, key: Tuple[int, int], value: Optional[Piece]):
-        repr_ = None if value is None else value.representation[0]
-        team_bitmask = 2 ** (self._BITSIZE - 1)
-        bitmask = 2**self._BITSIZE - 1
-        team = (
-            0 if value is None else team_bitmask * (int(value.representation[-1]) - 1)
+        bitshift = self._convert_index(key)
+        self.bit_representation &= ~(  # clear bits at position
+            self._PIECE_BITMASK << bitshift
         )
-        bitshift = self._convert_index(key) * self._BITSIZE
-        rep = (self._BIT_REPRESENTATIONS[repr_] + team) << bitshift
-        self._bit_representation &= ~(bitmask << bitshift)
-        self._bit_representation |= rep
+        if value is None:
+            return
+
+        team = 0 if value.representation[1] == "1" else self._TEAM_BITMASK
+        self.bit_representation |= (  # set bits at position
+            self._BIT_REPRESENTATIONS[value.representation[0]] + team
+        ) << bitshift
 
     def _init_bit_representation(self, pieces: List[Piece]):
         for piece in pieces:
             self[piece.position] = piece
 
+    @lru_cache
     def _convert_index(self, position: Tuple[int, int]) -> int:
-        x, y = position  # pylint: disable=invalid-name
-        return x + y * self.size
+        return (position[0] + position[1] * self.size) * self._BITSIZE
 
     def pop(self, position: Tuple[int, int]) -> Optional[int]:
         """Removes the piece at the specified position and returns it"""
@@ -243,23 +247,26 @@ class BitBoard:
         """Returns True if the checked position is None (contains no piece) else False"""
         return self[position] is None
 
+    @lru_cache
     def is_on_board(self, position: Tuple[int, int]) -> bool:
         """Returns True if the checked position is on the board"""
-        return all(0 <= x < self.size for x in position)
+        # return all(0 <= x < self.size for x in position)
+        return position in self._squares
 
     def is_enemy(self, position: Tuple[int, int], team: str) -> bool:
         """Returns True if the checked position contains a piece with a team
         that is not the one specified.
         """
         piece_ = self[position]
-        team_ = piece_ & 1 << (self._BITSIZE - 1) if piece_ is not None else 0
-        return team == str(team_)
+        if piece_ is None:
+            return False
+        team_bit = piece_ & self._TEAM_BITMASK
+        if team == "2":
+            return team_bit == 0
+        return team_bit != 0
 
     def is_draw_by_repetition(
         self, repetitions: int = 3, number_of_teams: int = 2
     ) -> bool:
         """Returns True if the teams have repeated the same moves a specified amount of times"""
-        number_of_moves = repetitions * number_of_teams * 2
-        if len(self.move_history) < number_of_moves:
-            return False
-        return len(set(self.move_history[-number_of_moves:])) == number_of_teams * 2
+        return Board.is_draw_by_repetition(self, repetitions, number_of_teams)  # type: ignore

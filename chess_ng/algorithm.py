@@ -10,7 +10,7 @@ from typing import Callable, Dict, List, Optional, Protocol, Tuple, Union
 
 import numpy as np
 
-from chess_ng.board import Board
+from chess_ng.board import BitBoard, Board
 from chess_ng.hashing import compute_hash
 from chess_ng.move import Move
 from chess_ng.piece import King, Piece
@@ -46,15 +46,41 @@ class ReversibleMove:
     def __post_init__(self):
         self.original_position: Tuple[int, int] = None  # type: ignore
         self.captured_piece: Optional[Piece] = None
+        self._original_bit_representation: int = 0
 
     def __enter__(self):
         self.original_position = self.piece.position
+
+        if isinstance(self.board, BitBoard):
+            self._original_bit_representation = self.board.bit_representation
+            if not self.board.is_empty_at(self.position) and self.board.is_enemy(
+                self.position, self.piece.team
+            ):
+                index, self.captured_piece = [
+                    (i, x)
+                    for i, x in enumerate(self.enemy_pieces)
+                    if x.position == self.position
+                ][0]
+                self.enemy_pieces.pop(index)
+            self.board[self.position] = self.piece
+            self.piece.position = self.position
+            self.board[self.original_position] = None
+            return self
+
         self.captured_piece = self.board.move_piece_and_capture(
             self.position, self.piece, self.enemy_pieces, log=False
         )
         return self
 
     def __exit__(self, *_):
+        if isinstance(self.board, BitBoard):
+            self.piece.position = self.original_position
+            self.piece.update(self.board)
+            self.board.bit_representation = self._original_bit_representation
+            if self.captured_piece is not None:
+                self.enemy_pieces.append(self.captured_piece)
+            return
+
         # undo move
         self.board.move_piece_and_capture(
             self.original_position, self.piece, self.enemy_pieces, log=False

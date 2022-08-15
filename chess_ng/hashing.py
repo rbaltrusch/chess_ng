@@ -7,7 +7,7 @@ Created on Sat Jan 22 14:53:45 2022
 import math
 from typing import Dict, Iterable, List, Tuple
 
-from chess_ng.board import Board
+from chess_ng.board import BitBoard, Board
 from chess_ng.piece import Piece
 
 
@@ -21,6 +21,9 @@ def get_hash_values(pieces: List[Piece]) -> Dict[str, int]:
 
 def compute_hash(board: Board, hash_values: Dict[str, int]) -> int:
     """Computes a new hash from the board the specified hash_values lookup table"""
+    if isinstance(board, BitBoard):
+        return board.bit_representation
+
     # pylint: disable=invalid-name
     if not hash_values:
         return 0
