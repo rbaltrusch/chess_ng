@@ -91,8 +91,7 @@ class Board:
         """Moves the passed piece from the current position to the passed position"""
         self.pop(piece.position)
         piece.move_to(position, log=log)
-        self._pieces[piece.position] = piece
-        self._squares[piece.position] = piece
+        self[piece.position] = piece
         self.move_history.append((piece, position))
 
     def capture_at(
