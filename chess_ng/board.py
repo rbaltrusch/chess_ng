@@ -65,6 +65,11 @@ class Board:
         self._pieces[key] = value
         self._squares[key] = value
 
+    def pop(self, position: Tuple[int, int]) -> Optional[Piece]:
+        """Removes the piece at the specified position and returns it"""
+        self._squares[position] = None
+        return self._pieces.pop(position)
+
     def move_piece_and_capture(
         self,
         position: Tuple[int, int],
@@ -84,8 +89,7 @@ class Board:
         self, piece: Piece, position: Tuple[int, int], log: bool = True
     ) -> None:
         """Moves the passed piece from the current position to the passed position"""
-        self._pieces.pop(piece.position)
-        self._squares[piece.position] = None
+        self.pop(piece.position)
         piece.move_to(position, log=log)
         self._pieces[piece.position] = piece
         self._squares[piece.position] = piece
@@ -97,8 +101,7 @@ class Board:
         """Removes the piece at the passed position and marks it as captured"""
         if self.is_empty_at(position):
             return None
-        piece: Piece = self._pieces.pop(position)  # type: ignore
-        self._squares[position] = None
+        piece: Piece = self.pop(position)  # type: ignore
         piece.captured = True
         if log:
             print(f"Captured {piece}")
