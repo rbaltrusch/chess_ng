@@ -34,7 +34,9 @@ def compute_hash(board: Board, hash_values: Dict[str, int]) -> int:
             if piece is None:
                 continue
 
-            value = hash_values[piece.representation]
+            value = (
+                piece if isinstance(piece, int) else hash_values[piece.representation]
+            )
             num = value << counter * exponent
             hash_ ^= num
     return hash_
@@ -53,7 +55,11 @@ def update_hash(
     for x, y in changed_positions:
         counter = y * board.size + x
         piece = board[x, y]
-        value = hash_values[piece.representation] if piece is not None else 0
+        value = (
+            piece
+            if isinstance(piece, int)
+            else (hash_values[piece.representation] if piece is not None else 0)
+        )
         num = value << counter * exponent
         hash_ &= ~(max_ << counter * exponent)
         hash_ ^= num

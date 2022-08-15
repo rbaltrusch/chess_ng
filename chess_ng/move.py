@@ -44,7 +44,7 @@ class LineMove:
             square = board[x, y]
             if square is None:
                 moves.append(Move((x, y)))
-            elif square.team != team:
+            elif board.is_enemy((x, y), team):
                 moves.append(Move((x, y), can_capture=True))
             if square is not None:
                 break
@@ -55,7 +55,7 @@ class LineMove:
             if square is None:
                 moves.append(Move((x, y)))
             else:
-                if square.team != team and self.can_capture:
+                if board.is_enemy((x, y), team) and self.can_capture:
                     moves.append(Move((x, y), can_capture=True))
                 break
 
@@ -73,7 +73,7 @@ class LineMove:
             if square is None:
                 forward_moves.append(Move((x, y)))
             else:
-                if square.team != team and self.can_capture:
+                if board.is_enemy((x, y), team) and self.can_capture:
                     forward_moves.append(Move((x, y), can_capture=True))
                 break
 
@@ -86,7 +86,7 @@ class LineMove:
             if square is None:
                 backward_moves.append(Move((x, y)))
             else:
-                if square.team != team and self.can_capture:
+                if board.is_enemy((x, y), team) and self.can_capture:
                     backward_moves.append(Move((x, y), can_capture=True))
                 break
 
@@ -111,7 +111,7 @@ class BishopMove:
                 square = board[pos]
                 if square is None:
                     moves.append(Move(pos))
-                elif square.team != team:
+                elif board.is_enemy((x, y), team):
                     moves.append(Move(pos, can_capture=True))
                 if square is not None:
                     break
@@ -157,7 +157,7 @@ class KingMove:
             square = board[pos]
             if square is None:
                 moves.append(Move(pos))
-            elif square.team != piece.team:
+            elif board.is_enemy(pos, piece.team):
                 moves.append(Move(pos, can_capture=True))
         return moves
 
