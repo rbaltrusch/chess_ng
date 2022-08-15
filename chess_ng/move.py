@@ -111,7 +111,7 @@ class BishopMove:
                 square = board[pos]
                 if square is None:
                     moves.append(Move(pos))
-                elif board.is_enemy((x, y), team):
+                elif board.is_enemy(pos, team):
                     moves.append(Move(pos, can_capture=True))
                 if square is not None:
                     break
