@@ -76,7 +76,7 @@ class Board:
         piece: Piece,
         enemy_pieces: List[Piece],
         log: bool = True,
-    ):
+    ) -> Optional[Piece]:
         """Moves piece to position on the board. Captures enemy if there is one"""
         captured_piece = None
         if not self.is_empty_at(position) and self[position] in enemy_pieces:
