@@ -9,7 +9,7 @@ import re
 from functools import lru_cache
 from typing import Dict, List, Optional, Tuple
 
-from colorama import Back, Fore, Style
+from colorama import Back, Fore, Style  # type: ignore
 
 from chess_ng.consts import WHITE
 from chess_ng.interfaces import Piece
@@ -24,7 +24,7 @@ class Board:
         )
 
         self._squares = {
-            pos: self._pieces.get(pos)
+            pos: self._pieces.get(pos)  # type: ignore
             for pos in itertools.product(range(size), repeat=2)
         }
         self.size = size
@@ -250,7 +250,6 @@ class BitBoard:
     @lru_cache
     def is_on_board(self, position: Tuple[int, int]) -> bool:
         """Returns True if the checked position is on the board"""
-        # return all(0 <= x < self.size for x in position)
         return position in self._squares
 
     def is_enemy(self, position: Tuple[int, int], team: str) -> bool:

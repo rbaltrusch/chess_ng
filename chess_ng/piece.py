@@ -119,8 +119,8 @@ class Pawn(Piece):
             self.promoted = False
             self.moves = self._unpromoted_moves
 
-    @property
-    def representation(self):
+    @property  # type: ignore
+    def representation(self) -> str:  # type: ignore
         """Representation getter, depends on the promoted state"""
         return f"{QUEEN}{self.team}" if self.promoted else f"{PAWN}{self.team}"
 
@@ -180,7 +180,7 @@ class Queen(Piece):
     """Queen class. Contains all the queen moves"""
 
     def __init__(self, _, position: Position, representation: str):
-        moves = [move.RookMove(), move.BishopMove()]
+        moves: Sequence[MoveInterface] = [move.RookMove(), move.BishopMove()]
         self.depth_counter = 3
         super().__init__(moves, position, representation)
 

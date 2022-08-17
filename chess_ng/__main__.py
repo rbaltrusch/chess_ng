@@ -5,10 +5,9 @@ Created on Mon Feb  8 13:36:04 2021
 @author: Korean_Crimson
 """
 import logging
-import math
 import random
 import time
-from typing import Dict, List, Sequence, Tuple
+from typing import Dict, List, Optional, Sequence, Tuple
 
 from chess_ng import hashing
 from chess_ng.algorithm import Minimax, evaluate_length, mating_strategy
@@ -24,6 +23,7 @@ def init_pieces() -> Tuple[Team, Team]:
     # pylint: disable=invalid-name
     pieces: Dict[str, List[Piece]] = {WHITE: [], BLACK: []}
     for y, row in enumerate(BOARD):
+        square: Optional[str]
         for x, square in enumerate(row):
             if square is not None:
                 piece_type, team = square
