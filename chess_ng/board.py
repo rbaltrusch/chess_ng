@@ -29,6 +29,7 @@ class Board:
         }
         self.size = size
         self.move_history: List[Tuple[Piece, Tuple[int, int]]] = []
+        self._positions = set(self._squares)  # for optimization
 
     def __repr__(self):
         # pylint: disable=invalid-name
@@ -111,9 +112,10 @@ class Board:
         """Returns True if the checked position is None (contains no piece) else False"""
         return self[position] is None
 
+    @lru_cache
     def is_on_board(self, position: Tuple[int, int]) -> bool:
         """Returns True if the checked position is on the board"""
-        return position in self._squares
+        return position in self._positions
 
     def is_enemy(self, position: Tuple[int, int], team: str) -> bool:
         """Returns True if the checked position contains a piece with a team
