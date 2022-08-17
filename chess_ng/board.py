@@ -234,19 +234,30 @@ class BitBoard:
         log: bool = True,
     ):
         """Moves piece to position on the board. Captures enemy if there is one"""
-        return Board.move_piece_and_capture(self, position, piece, enemy_pieces, log)  # type: ignore
+        captured_piece = None
+        if not self.is_empty_at(position):
+            self.capture_at(position, log=log)
+            capturable = [x for x in enemy_pieces if x.position == position]
+            if capturable:
+                captured_piece = capturable[0]
+                enemy_pieces.remove(captured_piece)
+        self.move_piece(piece, position, log=log)
+        return captured_piece
 
     def move_piece(
         self, piece: Piece, position: Tuple[int, int], log: bool = True
     ) -> None:
         """Moves the passed piece from the current position to the passed position"""
-        return Board.move_piece(self, piece, position, log)  # type: ignore
+        self.pop(piece.position)
+        piece.move_to(position, log=log)
+        self[piece.position] = piece
+        self.move_history.append((piece, position))
 
-    def capture_at(
-        self, position: Tuple[int, int], log: bool = True
-    ) -> Optional[Piece]:
+    def capture_at(self, position: Tuple[int, int], log: bool = True) -> Optional[int]:
         """Removes the piece at the passed position and marks it as captured"""
-        return Board.capture_at(self, position, log)  # type: ignore
+        if log:
+            print(f"Captured piece at {position}")
+        return self.pop(position)
 
     def is_empty_at(self, position: Tuple[int, int]) -> bool:
         """Returns True if the checked position is None (contains no piece) else False"""
