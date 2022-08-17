@@ -22,7 +22,7 @@ def get_hash_values(pieces: List[Piece]) -> Dict[str, int]:
 def compute_hash(board: Board, hash_values: Dict[str, int]) -> int:
     """Computes a new hash from the board the specified hash_values lookup table"""
     if isinstance(board, BitBoard):
-        return board.bit_representation
+        return hash(board)
 
     # pylint: disable=invalid-name
     if not hash_values:

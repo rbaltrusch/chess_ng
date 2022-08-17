@@ -185,6 +185,9 @@ class BitBoard:
             print()
         return ""
 
+    def __hash__(self):
+        return self.bit_representation
+
     def __iter__(self):
         # pylint: disable=invalid-name
         for y in range(self.size):
