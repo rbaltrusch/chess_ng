@@ -134,7 +134,7 @@ class InitialPawnMove:
 
         def empty(y_: int):
             pos = (x, y + y_ * dir_)
-            return board.is_empty_at(pos) and board.is_on_board(pos)
+            return board.is_on_board(pos) and board.is_empty_at(pos)
 
         return [Move((x, y + 2 * dir_))] if empty(1) and empty(2) else []
 
