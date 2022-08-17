@@ -175,7 +175,7 @@ class Minimax:
     hash_values: Dict[str, int]
 
     def __post_init__(self):
-        self.board_hashes: Dict[Tuple[bool, int], Number] = {}
+        self.board_hashes: Dict[int, Number] = {}
 
     # pylint: disable=too-many-arguments,too-many-locals,too-many-branches #for now...
     def run(
@@ -184,9 +184,9 @@ class Minimax:
         team: _TeamInterface,
         enemy: _TeamInterface,
         depth: int,
-        alpha: Number,
-        beta: Number,
         maximizing_player: bool,
+        alpha: Number = -math.inf,
+        beta: Number = math.inf,
     ) -> Tuple[Number, Optional[Tuple[Piece, Move]]]:
         """Minimax algorithm with alpha-beta pruning.
         At depth=3, computation speed is still relatively fast.
@@ -199,22 +199,18 @@ class Minimax:
         if depth == 0:  # or game over
             evaluation = self.evaluation_function(board, team, enemy)
             hash_ = compute_hash(board, self.hash_values)
-            self.board_hashes[maximizing_player, hash_] = evaluation
+            self.board_hashes[hash_] = evaluation
             return evaluation, None
 
         if maximizing_player:
             best_move = None
             for piece, move in team.compute_valid_moves(board, enemy.pieces):
-                search_depth = depth - 1
-                search_depth = piece.increase_search_depth(search_depth)
-
-                hash_ = compute_hash(board, self.hash_values)
-                eval_position = self.board_hashes.get((maximizing_player, hash_))
-                if eval_position is None:
-                    with ReversibleMove(board, piece, move.position, enemy.pieces):
-                        eval_position = self.run(
-                            board, team, enemy, search_depth, alpha, beta, False
-                        )[0]
+                with ReversibleMove(board, piece, move.position, enemy.pieces):
+                    hash_ = compute_hash(board, self.hash_values)
+                    eval_position = self.board_hashes.get(
+                        hash_,
+                        self.run(board, team, enemy, depth - 1, False, alpha, beta)[0],
+                    )
 
                 if eval_position > alpha:
                     best_move = (piece, move)
@@ -225,16 +221,12 @@ class Minimax:
 
         min_move = None
         for piece, move in enemy.compute_valid_moves(board, team.pieces):
-            search_depth = depth - 1
-            search_depth = piece.increase_search_depth(search_depth)
-
-            hash_ = compute_hash(board, self.hash_values)
-            eval_position = self.board_hashes.get((maximizing_player, hash_))
-            if eval_position is None:
-                with ReversibleMove(board, piece, move.position, team.pieces):
-                    eval_position = self.run(
-                        board, team, enemy, search_depth, alpha, beta, True
-                    )[0]
+            with ReversibleMove(board, piece, move.position, team.pieces):
+                hash_ = compute_hash(board, self.hash_values)
+                eval_position = self.board_hashes.get(
+                    hash_,
+                    self.run(board, team, enemy, depth - 1, True, alpha, beta)[0],
+                )
 
             if eval_position < beta:
                 min_move = (piece, move)

@@ -83,8 +83,6 @@ def game(
                 team,
                 enemy,
                 depth=depth,
-                alpha=-math.inf,
-                beta=math.inf,
                 maximizing_player=True,
             )
 
