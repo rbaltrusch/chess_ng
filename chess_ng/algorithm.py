@@ -78,6 +78,7 @@ class ReversibleMove:
             self.piece.update(self.board)
             self.board.bit_representation = self._original_bit_representation
             if self.captured_piece is not None:
+                self.captured_piece.captured = False
                 self.enemy_pieces.append(self.captured_piece)
             return
 
