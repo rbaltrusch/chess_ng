@@ -54,6 +54,9 @@ class Piece:
 
     def compute_valid_moves(self, board: Board) -> List[Move]:
         """Returns a list of squares that the piece can move to or capture at"""
+        if self.captured:
+            return []
+
         return [
             tuple_
             for move in self.moves
