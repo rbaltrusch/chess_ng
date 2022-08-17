@@ -204,7 +204,6 @@ class Minimax:
 
         if maximizing_player:
             best_move = None
-            max_eval = -math.inf
             for piece, move in team.compute_valid_moves(board, enemy.pieces):
                 search_depth = depth - 1
                 search_depth = piece.increase_search_depth(search_depth)
@@ -217,17 +216,13 @@ class Minimax:
                             board, team, enemy, search_depth, alpha, beta, False
                         )[0]
 
-                if eval_position > max_eval or best_move is None:
+                if eval_position > alpha:
                     best_move = (piece, move)
-                max_eval = max(max_eval, eval_position)
                 alpha = max(alpha, eval_position)
-                if eval_position >= beta:
+                if eval_position >= beta or beta <= alpha:
                     break
-                if beta <= alpha:
-                    break
-            return max_eval, best_move
+            return alpha, best_move
 
-        min_evaluation = math.inf
         min_move = None
         for piece, move in enemy.compute_valid_moves(board, team.pieces):
             search_depth = depth - 1
@@ -241,13 +236,10 @@ class Minimax:
                         board, team, enemy, search_depth, alpha, beta, True
                     )[0]
 
-            if eval_position < min_evaluation or min_move is None:
+            if eval_position < beta:
                 min_move = (piece, move)
-            min_evaluation = min(min_evaluation, eval_position)
             beta = min(beta, eval_position)
-            if eval_position <= alpha:
-                break
-            if beta <= alpha:
+            if eval_position <= alpha or beta <= alpha:
                 break
 
-        return min_evaluation, min_move
+        return beta, min_move
