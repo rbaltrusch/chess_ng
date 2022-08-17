@@ -7,3 +7,7 @@ tests/reports/
 #profiler
 **/*.Result
 logs/
+
+venv/
+**/*.egg-info
+.vscode/

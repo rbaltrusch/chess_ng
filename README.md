@@ -1,5 +1,5 @@
-[![Unit tests](https://github.com/rbaltrusch/chess_engine/actions/workflows/pytest-unit-tests.yml/badge.svg)](https://github.com/rbaltrusch/chess_engine/actions/workflows/pytest-unit-tests.yml)
-[![Pylint](https://github.com/rbaltrusch/chess_engine/actions/workflows/pylint.yml/badge.svg)](https://github.com/rbaltrusch/chess_engine/actions/workflows/pylint.yml)
+[![Unit tests](https://github.com/rbaltrusch/chess_ng/actions/workflows/pytest-unit-tests.yml/badge.svg)](https://github.com/rbaltrusch/chess_ng/actions/workflows/pytest-unit-tests.yml)
+[![Pylint](https://github.com/rbaltrusch/chess_ng/actions/workflows/pylint.yml/badge.svg)](https://github.com/rbaltrusch/chess_ng/actions/workflows/pylint.yml)
 [![License: MIT](https://img.shields.io/badge/License-MIT-purple.svg)](https://opensource.org/licenses/MIT)
 
 # Chess Engine
@@ -28,7 +28,7 @@ An example game of the chess AI playing against itself can be found [here](https
 
 To get a copy of this repository, simply open up git bash in an empty folder and use the command:
 
-    $ git clone https://github.com/rbaltrusch/chess_engine
+    $ git clone https://github.com/rbaltrusch/chess_ng
 
 To install all python dependencies, run the following in your command line:
 
@@ -48,7 +48,7 @@ Written in Python 3.8.3.
 
 ## License
 
-This repository is open-source software available under the [MIT license](https://github.com/rbaltrusch/chess_engine/blob/master/LICENSE).
+This repository is open-source software available under the [MIT license](https://github.com/rbaltrusch/chess_ng/blob/master/LICENSE).
 
 ## Contact
 

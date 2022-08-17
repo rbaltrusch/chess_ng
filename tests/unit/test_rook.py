@@ -4,14 +4,14 @@ Created on Sun Jan  2 23:12:07 2022
 
 @author: richa
 """
-
 import random
+
 import pytest
-from chess_engine.util import convert
-from chess_engine.util import convert_str
-from chess_engine.board import Board
-from chess_engine.piece import Rook
-from chess_engine.piece import Pawn
+from chess_ng.board import Board
+from chess_ng.piece import Pawn
+from chess_ng.piece import Rook
+from chess_ng.util import convert
+from chess_ng.util import convert_str
 
 def test_rook():
     piece = Rook(None, convert_str("a1"), representation='R1')
