@@ -26,13 +26,10 @@ An example game of the chess AI playing against itself can be found [here](https
 
 ## Getting started
 
-To get a copy of this repository, simply open up git bash in an empty folder and use the command:
+Install the package using pip, then run it using:
 
-    $ git clone https://github.com/rbaltrusch/chess_ng
-
-To install all python dependencies, run the following in your command line:
-
-    python -m pip install -r requirements.txt
+    python -m pip install chess_ng
+    python -m chess_ng
 
 ## Next up: Machine learning ?
 
