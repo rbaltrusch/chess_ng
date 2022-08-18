@@ -22,7 +22,7 @@ This naturally encourages a lot of activity in the center and positional play, a
 
 An example game of the chess AI playing against itself can be found [here](https://www.chess.com/analysis/game/pgn/4TbhVit3ki).
 
-![Chess artificial intelligence playing a game](media/chess_ai.gif?raw=true "Chess artificial intelligence playing a game")
+![Chess artificial intelligence playing a game](https://github.com/rbaltrusch/chess_ng/blob/master/media/chess_ai.gif?raw=true "Chess artificial intelligence playing a game")
 
 ## Getting started
 
@@ -37,7 +37,7 @@ With weighted square parameters being given to improve the positional play of th
 
 ## Contributions
 
-All contributions are welcome! All details can be found in the [contribution guidelines](CONTRIBUTING.md).
+All contributions are welcome! All details can be found in the [contribution guidelines](https://github.com/rbaltrusch/chess_ng/blob/master/CONTRIBUTING.md).
 
 ## Python
 
