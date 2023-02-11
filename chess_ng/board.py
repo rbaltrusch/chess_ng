@@ -96,6 +96,7 @@ class Board:
         piece.move_to(position, log=log)
         self[piece.position] = piece
         self.move_history.append((piece, position))
+        piece.update(self)
 
     def capture_at(
         self, position: Tuple[int, int], log: bool = True
@@ -253,6 +254,7 @@ class BitBoard:
         piece.move_to(position, log=log)
         self[piece.position] = piece
         self.move_history.append((piece, position))
+        piece.update(self)
 
     def capture_at(self, position: Tuple[int, int], log: bool = True) -> Optional[int]:
         """Removes the piece at the passed position and marks it as captured"""

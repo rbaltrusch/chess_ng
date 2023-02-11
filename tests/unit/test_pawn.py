@@ -5,14 +5,11 @@ Created on Sat Jan  1 12:17:30 2022
 @author: richa
 """
 import pytest
+
 from chess_ng.board import Board
-from chess_ng.piece import Bishop
-from chess_ng.piece import Knight
-from chess_ng.piece import Pawn
-from chess_ng.piece import Queen
-from chess_ng.piece import Rook
-from chess_ng.util import convert
-from chess_ng.util import convert_str
+from chess_ng.piece import Bishop, Knight, Pawn, Queen, Rook
+from chess_ng.util import convert, convert_str
+
 
 @pytest.mark.parametrize("direction,position", [(-1, "a2"), (1, "a7")])
 def test_initial_pawn(direction, position):
@@ -102,8 +99,4 @@ def test_pawn_at_end_of_board(direction, position):
     board = Board(pieces=[piece], size=8)
     moves = piece.compute_valid_moves(board)
     assert len(moves) == 21 #promoted to queen
-
-if __name__ == '__main__':
-    import sys
-    sys.path.insert(1, '..')
-    test_pawn_at_end_of_board()
+    assert piece.representation == "Q1"
