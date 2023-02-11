@@ -74,6 +74,10 @@ def game(
                 logger.info("Draw by repetition.")
                 return
 
+            if board.is_draw_by_fifty_moves():
+                logger.info("Draw by 50 move rule.")
+                return
+
             if is_in_check:
                 logger.info("Moving out of check.")
 

@@ -13,6 +13,7 @@ from colorama import Back, Fore, Style  # type: ignore
 
 from chess_ng.consts import WHITE
 from chess_ng.interfaces import Piece
+from chess_ng.piece import Pawn
 
 
 class Board:
@@ -28,7 +29,7 @@ class Board:
             for pos in itertools.product(range(size), repeat=2)
         }
         self.size = size
-        self.move_history: List[Tuple[Piece, Tuple[int, int]]] = []
+        self.move_history: List[Tuple[Piece, Tuple[int, int], bool]] = []
         self._positions = set(self._squares)  # for optimization
 
     def __repr__(self):
@@ -82,20 +83,22 @@ class Board:
     ) -> Optional[Piece]:
         """Moves piece to position on the board. Captures enemy if there is one"""
         captured_piece = None
+        was_capture = False
         if not self.is_empty_at(position) and self[position] in enemy_pieces:
             captured_piece = self.capture_at(position, log=log)
             enemy_pieces.remove(captured_piece)  # type: ignore
-        self.move_piece(piece, position, log=log)
+            was_capture = True
+        self.move_piece(piece, position, was_capture, log=log)
         return captured_piece
 
     def move_piece(
-        self, piece: Piece, position: Tuple[int, int], log: bool = True
+        self, piece: Piece, position: Tuple[int, int], capture: bool = False, log: bool = True
     ) -> None:
         """Moves the passed piece from the current position to the passed position"""
         self._pop(piece.position)
         piece.move_to(position, log=log)
         self[piece.position] = piece
-        self.move_history.append((piece, position))
+        self.move_history.append((piece, position, capture))
         piece.update(self)
 
     def capture_at(
@@ -134,6 +137,17 @@ class Board:
             return False
         return len(set(self.move_history[-number_of_moves:])) == number_of_teams * 2
 
+    def is_draw_by_fifty_moves(self):
+        if len(self.move_history) < 100:
+            return False
+        last_fifty_moves = self.move_history[-100:]
+        for move in last_fifty_moves:
+            # If there was a pawn move or a capture, it's a draw
+            if isinstance(move[0], Pawn) or move[2]:
+                return False
+        return True
+
+
 
 class BitBoard:
     """Board implemented with bitfields"""
@@ -152,7 +166,7 @@ class BitBoard:
     }
 
     def __init__(self, pieces: List[Piece], size: int = 8):
-        self.move_history: List[Tuple[Piece, Tuple[int, int]]] = []
+        self.move_history: List[Tuple[Piece, Tuple[int, int], bool]] = []
         self.size = size
         self.bit_representation: int = 0
         self._init_bit_representation(pieces)
@@ -237,23 +251,25 @@ class BitBoard:
     ):
         """Moves piece to position on the board. Captures enemy if there is one"""
         captured_piece = None
+        was_capture = False
         if not self.is_empty_at(position):
             self.capture_at(position, log=log)
             capturable = [x for x in enemy_pieces if x.position == position]
             if capturable:
                 captured_piece = capturable[0]
                 enemy_pieces.remove(captured_piece)
-        self.move_piece(piece, position, log=log)
+                was_capture = True
+        self.move_piece(piece, position, was_capture, log=log)
         return captured_piece
 
     def move_piece(
-        self, piece: Piece, position: Tuple[int, int], log: bool = True
+        self, piece: Piece, position: Tuple[int, int], capture: bool, log: bool = True
     ) -> None:
         """Moves the passed piece from the current position to the passed position"""
         self._pop(piece.position)
         piece.move_to(position, log=log)
         self[piece.position] = piece
-        self.move_history.append((piece, position))
+        self.move_history.append((piece, position, capture))
         piece.update(self)
 
     def capture_at(self, position: Tuple[int, int], log: bool = True) -> Optional[int]:

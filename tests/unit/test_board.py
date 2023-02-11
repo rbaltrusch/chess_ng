@@ -10,7 +10,7 @@ import itertools
 import pytest
 
 from chess_ng.board import Board
-from chess_ng.piece import Pawn, Piece
+from chess_ng.piece import Pawn, Piece, Bishop
 from chess_ng.util import convert_str
 
 
@@ -80,3 +80,11 @@ def test_board_repr():
     piece = Pawn(direction=-1, position="a2", representation="o1")
     board = Board(pieces=[piece], size=8)
     board.__repr__()
+
+def test_board_fifty_move_draw():
+    bishop = Bishop(direction=-1, position="a1", representation="B1")
+    board = Board(pieces=[bishop], size=8)
+    for i in range(50):
+        board.move_piece(bishop, (1,1))
+        board.move_piece(bishop, (0,0))
+    assert board.is_draw_by_fifty_moves()
