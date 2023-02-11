@@ -77,8 +77,8 @@ def game(
             if is_in_check:
                 logger.info("Moving out of check.")
 
-            team.queen.depth_counter = 0
-            enemy.queen.depth_counter = 0
+            # team.queen.depth_counter = 3
+            # enemy.queen.depth_counter = 3
             rating, move_result = minimax.run(
                 board,
                 team,
@@ -128,10 +128,10 @@ def main():
             teams,
             hash_values,
             logger,
-            depth=5,
+            depth=4,
             moves=10,
             resign_threshold=-50,
-            mating_threshold=20,
+            mating_threshold=50,
         )
 
 
