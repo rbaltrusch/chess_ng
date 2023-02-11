@@ -142,7 +142,7 @@ class Board:
             return False
         last_fifty_moves = self.move_history[-100:]
         for move in last_fifty_moves:
-            # If there was a pawn move or a capture, it's a draw
+            # If there was a pawn move or a capture, it's not a draw
             if isinstance(move[0], Pawn) or move[2]:
                 return False
         return True
