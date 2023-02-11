@@ -137,7 +137,7 @@ class Board:
             return False
         return len(set(self.move_history[-number_of_moves:])) == number_of_teams * 2
 
-    def is_draw_by_fifty_moves(self):
+    def is_draw_by_fifty_moves(self) -> bool:
         if len(self.move_history) < 100:
             return False
         last_fifty_moves = self.move_history[-100:]
