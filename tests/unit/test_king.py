@@ -5,11 +5,11 @@ Created on Sun Jan  2 23:03:05 2022
 @author: richa
 """
 import pytest
+
 from chess_ng.board import Board
-from chess_ng.piece import King
-from chess_ng.piece import Pawn
-from chess_ng.util import convert
-from chess_ng.util import convert_str
+from chess_ng.piece import King, Pawn
+from chess_ng.util import convert, convert_str
+
 
 @pytest.mark.parametrize("position,expected", [("a1", 3),
                                                ("a2", 5),
@@ -50,8 +50,3 @@ def test_king_capture(position, length, expected):
     positions = list(move.position for move in moves)
     assert len(list(map(convert, positions))) == length
     assert (convert_str(position) in positions) is expected
-
-if __name__ == '__main__':
-    import sys
-    sys.path.insert(1, '..')
-    test_king('a1', 3)

@@ -104,7 +104,6 @@ def get_parser():
 def main():
     parser = get_parser()
     args = parser.parse_args()
-    sys.argv = [__file__]
     run_tests(args)
 
 if __name__ == '__main__':
