@@ -6,12 +6,10 @@ Created on Mon Feb  8 12:56:04 2021
 """
 import itertools
 from dataclasses import dataclass
-from typing import List, Literal, Union
+from typing import List
 
-from chess_ng.interfaces import Board, Piece
+from chess_ng.interfaces import Board, Direction, Piece
 from chess_ng.util import Move
-
-Direction = Union[Literal[-1], Literal[1]]
 
 
 # pylint: disable=invalid-name
@@ -103,11 +101,13 @@ class BishopMove:
     def compute_valid_moves(board: Board, piece: Piece) -> List[Move]:
         """Computes all valid moves that can be made from the passed position"""
         moves: List[Move] = []
-        x, y = piece.position
+        x_pos, y_pos = piece.position
         team = piece.team
         for x_dir, y_dir in itertools.product((1, -1), repeat=2):
-            pos = (x + x_dir, y + y_dir)
-            while board.is_on_board(pos):
+            x = x_pos + x_dir
+            y = y_pos + y_dir
+            while board.is_on_board((x, y)):
+                pos = (x, y)
                 square = board[pos]
                 if square is None:
                     moves.append(Move(pos))
@@ -115,7 +115,8 @@ class BishopMove:
                     moves.append(Move(pos, can_capture=True))
                 if square is not None:
                     break
-                pos = (pos[0] + x_dir, pos[1] + y_dir)
+                x += x_dir
+                y += y_dir
         return moves
 
 

@@ -9,9 +9,9 @@ from typing import Dict, List, Tuple
 
 from chess_ng.algorithm import ReversibleMove
 from chess_ng.board import Board
-from chess_ng.consts import EARLY_VALUES
+from chess_ng.interfaces import Piece
 from chess_ng.move import Move
-from chess_ng.piece import King, Piece, Queen
+from chess_ng.piece import King, Queen
 
 
 @dataclass
@@ -22,9 +22,10 @@ class Team:
     representation: str
 
     def __post_init__(self):
-        self.king = [x for x in self.pieces if isinstance(x, King)][0]
-        self.queen = [x for x in self.pieces if isinstance(x, Queen)][0]
-        self.sort_pieces(EARLY_VALUES)
+        self.king: King = [x for x in self.pieces if isinstance(x, King)][0]
+        queens = [x for x in self.pieces if isinstance(x, Queen)]
+        self.queen = queens[0] if queens else None
+        # self.sort_pieces(EARLY_VALUES)
 
     def __repr__(self):
         return self.representation

@@ -12,8 +12,9 @@ import numpy as np
 
 from chess_ng.board import BitBoard, Board
 from chess_ng.hashing import compute_hash
+from chess_ng.interfaces import Piece
 from chess_ng.move import Move
-from chess_ng.piece import King, Piece
+from chess_ng.piece import King
 
 Number = Union[int, float]
 

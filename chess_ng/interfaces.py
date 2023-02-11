@@ -3,11 +3,13 @@
 
 from __future__ import annotations
 
-from typing import List, Optional, Protocol, Sequence, Tuple
+from typing import List, Literal, Optional, Protocol, Tuple, Union
 
 from chess_ng.util import Move
 
 # pylint: disable=missing-class-docstring, missing-function-docstring
+
+Direction = Union[Literal[-1], Literal[1]]
 
 
 class MoveInterface(Protocol):  # pylint: disable=too-few-public-methods
@@ -36,7 +38,6 @@ class Board(Protocol):
 class Piece(Protocol):
 
     turn_counter: float = 0.0
-    moves: Sequence[MoveInterface]
     position: Tuple[int, int]
     representation: str
     team: str
@@ -59,4 +60,12 @@ class Piece(Protocol):
         ...
 
     def can_capture_at(self, board: Board, position: Tuple[int, int]) -> bool:
+        ...
+
+
+# pylint: disable=too-few-public-methods
+class PieceFactory(Protocol):
+    def __call__(
+        self, direction: Direction, position: Tuple[int, int], representation: str
+    ) -> Piece:
         ...

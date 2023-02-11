@@ -19,7 +19,7 @@ class Board:
     """Board class. Contains all the pieces on the chess board"""
 
     def __init__(self, pieces: Optional[List[Piece]] = None, size: int = 8):
-        self._pieces: Dict[Tuple[int, int], Optional[Piece]] = (
+        self._pieces: Dict[Tuple[int, int], Piece] = (
             {piece.position: piece for piece in pieces} if pieces is not None else {}
         )
 
@@ -64,10 +64,11 @@ class Board:
         return self._squares.get(value)
 
     def __setitem__(self, key: Tuple[int, int], value: Optional[Piece]):
-        self._pieces[key] = value
+        if value is not None:
+            self._pieces[key] = value
         self._squares[key] = value
 
-    def pop(self, position: Tuple[int, int]) -> Optional[Piece]:
+    def _pop(self, position: Tuple[int, int]) -> Piece:
         """Removes the piece at the specified position and returns it"""
         self._squares[position] = None
         return self._pieces.pop(position)
@@ -91,7 +92,7 @@ class Board:
         self, piece: Piece, position: Tuple[int, int], log: bool = True
     ) -> None:
         """Moves the passed piece from the current position to the passed position"""
-        self.pop(piece.position)
+        self._pop(piece.position)
         piece.move_to(position, log=log)
         self[piece.position] = piece
         self.move_history.append((piece, position))
@@ -102,7 +103,7 @@ class Board:
         """Removes the piece at the passed position and marks it as captured"""
         if self.is_empty_at(position):
             return None
-        piece: Piece = self.pop(position)  # type: ignore
+        piece = self._pop(position)
         piece.captured = True
         if log:
             print(f"Captured {piece}")
@@ -220,7 +221,7 @@ class BitBoard:
     def _convert_index(self, position: Tuple[int, int]) -> int:
         return (position[0] + position[1] * self.size) * self._BITSIZE
 
-    def pop(self, position: Tuple[int, int]) -> Optional[int]:
+    def _pop(self, position: Tuple[int, int]) -> Optional[int]:
         """Removes the piece at the specified position and returns it"""
         val = self[position]
         self[position] = None
@@ -248,7 +249,7 @@ class BitBoard:
         self, piece: Piece, position: Tuple[int, int], log: bool = True
     ) -> None:
         """Moves the passed piece from the current position to the passed position"""
-        self.pop(piece.position)
+        self._pop(piece.position)
         piece.move_to(position, log=log)
         self[piece.position] = piece
         self.move_history.append((piece, position))
@@ -257,7 +258,7 @@ class BitBoard:
         """Removes the piece at the passed position and marks it as captured"""
         if log:
             print(f"Captured piece at {position}")
-        return self.pop(position)
+        return self._pop(position)
 
     def is_empty_at(self, position: Tuple[int, int]) -> bool:
         """Returns True if the checked position is None (contains no piece) else False"""

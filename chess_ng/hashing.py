@@ -8,7 +8,7 @@ import math
 from typing import Dict, Iterable, List, Tuple
 
 from chess_ng.board import BitBoard, Board
-from chess_ng.piece import Piece
+from chess_ng.interfaces import Piece
 
 
 def get_hash_values(pieces: List[Piece]) -> Dict[str, int]:

@@ -9,11 +9,11 @@ from __future__ import annotations
 
 import logging
 import math
-from typing import List, Sequence, Tuple, Union
+from typing import Dict, List, Sequence, Tuple, Union
 
 from chess_ng import move
 from chess_ng.consts import BISHOP, KING, KNIGHT, PAWN, QUEEN, ROOK
-from chess_ng.interfaces import Board, MoveInterface
+from chess_ng.interfaces import Board, MoveInterface, PieceFactory
 from chess_ng.move import Direction
 from chess_ng.util import Move, convert, convert_str, is_diagonal, is_straight
 
@@ -28,7 +28,7 @@ class Piece:
     def __init__(
         self, moves: Sequence[MoveInterface], position: Position, representation: str
     ):
-        self.moves = moves
+        self._moves = moves
         self.position: Tuple[int, int] = (  # type: ignore
             convert_str(position) if isinstance(position, str) else position
         )
@@ -59,7 +59,7 @@ class Piece:
 
         return [
             tuple_
-            for move in self.moves
+            for move in self._moves
             for tuple_ in move.compute_valid_moves(board, self)
         ]
 
@@ -117,25 +117,20 @@ class Pawn(Piece):
         target_y = 0 if self.direction == -1 else board.size - 1
         if target_y in (y for _, y in self.position_history + [self.position]):
             self.promoted = True
-            self.moves = self._promoted_moves
+            self._moves = self._promoted_moves
         else:
             self.promoted = False
-            self.moves = self._unpromoted_moves
-
-    @property  # type: ignore
-    def representation(self) -> str:  # type: ignore
-        """Representation getter, depends on the promoted state"""
-        return f"{QUEEN}{self.team}" if self.promoted else f"{PAWN}{self.team}"
-
-    @representation.setter
-    def representation(self, value: str):
-        pass
+            self._moves = self._unpromoted_moves
+        self.representation = (
+            f"{QUEEN}{self.team}" if self.promoted else f"{PAWN}{self.team}"
+        )
 
 
 class Knight(Piece):
     """Knight class. Contains all the knight moves"""
 
-    def __init__(self, _, position: Position, representation: str):
+    # pylint: disable=unused-argument
+    def __init__(self, direction: Direction, position: Position, representation: str):
         moves = [move.KnightMove()]
         super().__init__(moves, position, representation)
 
@@ -152,7 +147,8 @@ class Knight(Piece):
 class Bishop(Piece):
     """Bishop class. Contains all the bishop moves"""
 
-    def __init__(self, _, position: Position, representation: str):
+    # pylint: disable=unused-argument
+    def __init__(self, direction: Direction, position: Position, representation: str):
         moves = [move.BishopMove()]
         super().__init__(moves, position, representation)
 
@@ -167,7 +163,8 @@ class Bishop(Piece):
 class Rook(Piece):
     """Rook class. Contains all the rook moves"""
 
-    def __init__(self, _, position: Position, representation: str):
+    # pylint: disable=unused-argument
+    def __init__(self, direction: Direction, position: Position, representation: str):
         moves = [move.RookMove()]
         super().__init__(moves, position, representation)
 
@@ -182,7 +179,8 @@ class Rook(Piece):
 class Queen(Piece):
     """Queen class. Contains all the queen moves"""
 
-    def __init__(self, _, position: Position, representation: str):
+    # pylint: disable=unused-argument
+    def __init__(self, direction: Direction, position: Position, representation: str):
         moves: Sequence[MoveInterface] = [move.RookMove(), move.BishopMove()]
         self.depth_counter = 3
         super().__init__(moves, position, representation)
@@ -207,7 +205,8 @@ class Queen(Piece):
 class King(Piece):
     """King class. Contains all the king moves"""
 
-    def __init__(self, _, position: Position, representation: str):
+    # pylint: disable=unused-argument
+    def __init__(self, direction: Direction, position: Position, representation: str):
         moves = [move.KingMove()]
         super().__init__(moves, position, representation)
 
@@ -221,7 +220,7 @@ class King(Piece):
         return super().can_capture_at(board, position)
 
 
-PIECES = {
+PIECES: Dict[str, PieceFactory] = {
     PAWN: Pawn,
     KNIGHT: Knight,
     BISHOP: Bishop,

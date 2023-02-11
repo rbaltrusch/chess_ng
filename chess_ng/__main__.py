@@ -13,8 +13,9 @@ from chess_ng import hashing
 from chess_ng.algorithm import Minimax, evaluate_length, mating_strategy
 from chess_ng.board import Board
 from chess_ng.consts import BLACK, BOARD, DIRECTIONS, LATE_VALUES, MID_VALUES, WHITE
+from chess_ng.interfaces import Piece
 from chess_ng.output import Logger
-from chess_ng.piece import PIECES, Piece
+from chess_ng.piece import PIECES
 from chess_ng.team import Team
 
 
