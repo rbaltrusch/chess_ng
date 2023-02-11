@@ -157,7 +157,7 @@ def evaluate_distance_np(
 ) -> float:
     """Evaluates board state based on the closeness to the enemy king"""
     # seems to lead to very wonky games...
-    ally_moves = np.array([move.position for _, move in team.compute_all_moves(board)])  # type: ignore
+    ally_moves = np.array([move.position for _, move in team.compute_all_moves(board)])  # type: ignore #pylint: disable=line-too-long
     enemy_moves = np.array(  # type: ignore
         [move.position for _, move in enemy.compute_all_moves(board)]
     )
