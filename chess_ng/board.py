@@ -138,12 +138,12 @@ class Board:
         return len(set(self.move_history[-number_of_moves:])) == number_of_teams * 2
 
     def is_draw_by_fifty_moves(self) -> bool:
+        """Returns True if there has been 50 moves without a pawn move or capture"""
         if len(self.move_history) < 100:
             return False
         last_fifty_moves = self.move_history[-100:]
-        for move in last_fifty_moves:
-            # If there was a pawn move or a capture, it's not a draw
-            if isinstance(move[0], Pawn) or move[2]:
+        for piece, _, was_capture in last_fifty_moves:
+            if isinstance(piece, Pawn) or was_capture:
                 return False
         return True
 
@@ -304,3 +304,7 @@ class BitBoard:
     ) -> bool:
         """Returns True if the teams have repeated the same moves a specified amount of times"""
         return Board.is_draw_by_repetition(self, repetitions, number_of_teams)  # type: ignore
+
+    def is_draw_by_fifty_moves(self) -> bool:
+        """Returns True if there has been 50 moves without a pawn move or capture"""
+        return Board.is_draw_by_fifty_moves(self)
