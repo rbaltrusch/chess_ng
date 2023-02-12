@@ -6,7 +6,7 @@ import itertools
 import os
 import string
 from dataclasses import dataclass, field
-from typing import Dict, Protocol, Tuple
+from typing import Dict, Protocol, Tuple, Union
 
 from PIL import Image, ImageDraw, ImageFont
 
@@ -15,6 +15,7 @@ from chess_ng.board import Board
 from chess_ng.interfaces import Piece
 
 ImageDict = Dict[str, Dict[str, Image.Image]]
+Font = Union[ImageFont.FreeTypeFont, ImageFont.ImageFont]
 
 
 class PieceReader(
@@ -50,6 +51,14 @@ class DefaultPieceReader:
         return filename
 
 
+def load_default_font() -> Font:
+    """Loads the default font for the text on a chess board"""
+    try:
+        return ImageFont.truetype("arial.ttf", 20)
+    except OSError:
+        return ImageFont.load_default()
+
+
 @dataclass
 class ImageRenderer:
     """Renders the chess board as a PIL.Image.Image"""
@@ -57,9 +66,7 @@ class ImageRenderer:
     light: str = "#CCCCCC"
     dark: str = "#666666"
     text_colour: Tuple[int, int, int] = (255, 255, 255)
-    font: ImageFont.FreeTypeFont = field(
-        default_factory=lambda: ImageFont.truetype("arial.ttf", 20)
-    )
+    font: Font = field(default_factory=load_default_font)
     square_size: int = 60
     board_offset: int = 23
     piece_reader: PieceReader = field(default_factory=DefaultPieceReader)
