@@ -35,6 +35,31 @@ Install the package using pip, then run it using:
 
 With weighted square parameters being given to improve the positional play of the AI, it seems to be a logical next step to improve the AI using machine learning by combining random parameter adjustments with a genetic algorithm.
 
+## Graphical chess board
+
+To render a graphical chess board using the `chess_ng.renderer.ImageRenderer`, the class expects images of size 60x60 in the following tree structure at the root of the repository:
+
+```
+\---media/images
+    +---black
+    |       bishop.png
+    |       king.png
+    |       knight.png
+    |       pawn.png
+    |       queen.png
+    |       rook.png
+    |
+    \---white
+            bishop.png
+            king.png
+            knight.png
+            pawn.png
+            queen.png
+            rook.png
+```
+
+Images with a creative commons license can be downloaded from e.g. [here](https://commons.wikimedia.org/wiki/Category:PNG_chess_pieces/Standard_transparent).
+
 ## Contributions
 
 All contributions are welcome! All details can be found in the [contribution guidelines](https://github.com/rbaltrusch/chess_ng/blob/master/CONTRIBUTING.md).
