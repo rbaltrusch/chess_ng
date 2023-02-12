@@ -269,7 +269,7 @@ class BitBoard:
         self._pop(piece.position)
         piece.move_to(position, log=log)
         self[piece.position] = piece
-        self.move_history.append((piece, position, capture))
+        self.move_history.append((piece, position, capture))  # type: ignore
         piece.update(self)
 
     def capture_at(self, position: Tuple[int, int], log: bool = True) -> Optional[int]:

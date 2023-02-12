@@ -11,3 +11,7 @@ logs/
 venv/
 **/*.egg-info
 .vscode/
+
+#contains creative commons images of chess pieces
+media/images/
+board.png
