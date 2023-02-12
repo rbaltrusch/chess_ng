@@ -20,7 +20,7 @@ class MoveInterface(Protocol):  # pylint: disable=too-few-public-methods
 class Board(Protocol):
 
     size: int
-    move_history: List[Tuple[Piece, Tuple[int, int]]]
+    move_history: List[Tuple[Piece, Tuple[int, int], bool]]
 
     def __getitem__(self, value: Tuple[int, int]) -> Optional[Piece]:
         ...
