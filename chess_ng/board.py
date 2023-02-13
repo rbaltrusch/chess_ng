@@ -269,8 +269,8 @@ class BitBoard:
         self._pop(piece.position)
         piece.move_to(position, log=log)
         self[piece.position] = piece
-        self.move_history.append((piece, position, capture))  # type: ignore
-        piece.update(self)
+        self.move_history.append((piece, position, capture))
+        piece.update(self) # type: ignore
 
     def capture_at(self, position: Tuple[int, int], log: bool = True) -> Optional[int]:
         """Removes the piece at the passed position and marks it as captured"""
@@ -303,8 +303,8 @@ class BitBoard:
         self, repetitions: int = 3, number_of_teams: int = 2
     ) -> bool:
         """Returns True if the teams have repeated the same moves a specified amount of times"""
-        return Board.is_draw_by_repetition(self, repetitions, number_of_teams)  # type: ignore
+        return Board.is_draw_by_repetition(self, repetitions, number_of_teams) # type: ignore
 
     def is_draw_by_fifty_moves(self) -> bool:
         """Returns True if there has been 50 moves without a pawn move or capture"""
-        return Board.is_draw_by_fifty_moves(self)
+        return Board.is_draw_by_fifty_moves(self) # type: ignore
