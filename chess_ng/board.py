@@ -147,6 +147,10 @@ class Board:
                 return False
         return True
 
+    def is_draw(self) -> bool:
+        """Returns True if draw by repetition or draw by 50 moves rule"""
+        return self.is_draw_by_repetition() or self.is_draw_by_fifty_moves()
+
 
 
 class BitBoard:
@@ -308,3 +312,7 @@ class BitBoard:
     def is_draw_by_fifty_moves(self) -> bool:
         """Returns True if there has been 50 moves without a pawn move or capture"""
         return Board.is_draw_by_fifty_moves(self) # type: ignore
+
+    def is_draw(self) -> bool:
+        """Returns True if draw by repetition or draw by 50 moves rule"""
+        return Board.is_draw(self) # type: ignore

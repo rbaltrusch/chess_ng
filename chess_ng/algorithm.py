@@ -194,7 +194,7 @@ class Minimax:
         At depth=4, it slows down considerably, but does make much better moves.
         """
 
-        if board.is_draw_by_repetition():
+        if board.is_draw():
             return 0, None
 
         if depth == 0:  # or game over
