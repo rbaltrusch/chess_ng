@@ -34,6 +34,7 @@ class Board:
 
     def __repr__(self):
         # pylint: disable=invalid-name
+        repr_ = ""
         for y in range(self.size):
             for x in range(self.size):
                 if y % 2:
@@ -52,9 +53,9 @@ class Board:
                     representation = "  "
 
                 square = re.sub("[12]", " ", representation)
-                print(background + foreground + square, end="" + Style.RESET_ALL)
-            print()
-        return ""
+                repr_ += background + foreground + square + Style.RESET_ALL
+            repr_ += "\n"
+        return repr_
 
     def __iter__(self):
         # pylint: disable=invalid-name
@@ -92,7 +93,11 @@ class Board:
         return captured_piece
 
     def move_piece(
-        self, piece: Piece, position: Tuple[int, int], capture: bool = False, log: bool = True
+        self,
+        piece: Piece,
+        position: Tuple[int, int],
+        capture: bool = False,
+        log: bool = True,
     ) -> None:
         """Moves the passed piece from the current position to the passed position"""
         self._pop(piece.position)
@@ -150,7 +155,6 @@ class Board:
     def is_draw(self) -> bool:
         """Returns True if draw by repetition or draw by 50 moves rule"""
         return self.is_draw_by_repetition() or self.is_draw_by_fifty_moves()
-
 
 
 class BitBoard:
@@ -274,7 +278,7 @@ class BitBoard:
         piece.move_to(position, log=log)
         self[piece.position] = piece
         self.move_history.append((piece, position, capture))
-        piece.update(self) # type: ignore
+        piece.update(self)  # type: ignore
 
     def capture_at(self, position: Tuple[int, int], log: bool = True) -> Optional[int]:
         """Removes the piece at the passed position and marks it as captured"""
@@ -307,12 +311,12 @@ class BitBoard:
         self, repetitions: int = 3, number_of_teams: int = 2
     ) -> bool:
         """Returns True if the teams have repeated the same moves a specified amount of times"""
-        return Board.is_draw_by_repetition(self, repetitions, number_of_teams) # type: ignore
+        return Board.is_draw_by_repetition(self, repetitions, number_of_teams)  # type: ignore
 
     def is_draw_by_fifty_moves(self) -> bool:
         """Returns True if there has been 50 moves without a pawn move or capture"""
-        return Board.is_draw_by_fifty_moves(self) # type: ignore
+        return Board.is_draw_by_fifty_moves(self)  # type: ignore
 
     def is_draw(self) -> bool:
         """Returns True if draw by repetition or draw by 50 moves rule"""
-        return Board.is_draw(self) # type: ignore
+        return Board.is_draw(self)  # type: ignore
