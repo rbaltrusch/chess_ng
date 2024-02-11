@@ -28,7 +28,6 @@ class Logger:
         logging.shutdown()
 
     def _init_logger(self):
-        logging.basicConfig(format="%(message)s", level=logging.DEBUG)
         self.logger = logging.getLogger("game.log")
         self.logger.handlers.clear()
 
