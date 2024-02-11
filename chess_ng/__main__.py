@@ -4,16 +4,23 @@ Created on Mon Feb  8 13:36:04 2021
 
 @author: Korean_Crimson
 """
-import logging
+import itertools
 import random
 import time
-from typing import Callable
+from typing import Any, Callable, Optional
 
-from chess_ng.algorithm import mating_strategy
+from chess_ng import hashing, output
+from chess_ng.algorithm import (
+    Minimax,
+    evaluate_distance,
+    evaluate_length,
+    mating_strategy,
+)
 from chess_ng.board import Board
+from chess_ng.cli import create_parser
 from chess_ng.consts import BLACK, LATE_VALUES, MID_VALUES, WHITE
+from chess_ng.fen import load_fen_notation
 from chess_ng.game import ChessPositionError, Game, GameParams
-from chess_ng.output import Logger
 
 
 def move_player_automatically(game: Game, params: GameParams) -> None:
@@ -39,18 +46,33 @@ def move_player_by_cli(game: Game, _: GameParams) -> None:
             print(f"Invalid input: {exc.message}")
 
 
-# pylint: disable=too-many-arguments,too-many-locals,too-many-branches
+def init_game(args: Any) -> Game:
+    """Initialises a game from CLI args"""
+    evaluation = (
+        evaluate_length
+        if args.eval_algorithm == "moves"  # type: ignore
+        else evaluate_distance
+    )
+    teams, _ = load_fen_notation(args.fen)  # type: ignore
+    hash_values = hashing.get_hash_values(
+        [x for team in teams.values() for x in team.pieces]
+    )
+    return Game(teams, Minimax(evaluation, hash_values), player=args.player)  # type: ignore
+
+
+# pylint: disable=too-many-arguments
 def run_game(
     game: Game,
     params: GameParams,
     player_move_source: Callable[[Game, GameParams], None],
     renderer: Callable[[Board], None],
-    logger: logging.Logger,
-    moves: int = 50,
+    logger: output.LoggerProtocol,
+    moves: Optional[int] = 50,
 ):
     """Chess game function"""
     logger.info(f"Depth: {params.depth}")
-    for i in range(moves):
+    iterable = range(moves) if isinstance(moves, int) else itertools.count()
+    for i in iterable:
         if i > 15:
             for team in game.teams.values():
                 team.sort_pieces(MID_VALUES)
@@ -79,17 +101,25 @@ def run_game(
 
 def main():
     """Main function"""
-    seed = 0
-    random.seed(seed)
-    with Logger(folder="logs", filename="game.log") as logger:
-        logger.info("Seed: %s", seed)
+    parser = create_parser()
+    args = parser.parse_args()
+    random.seed(args.seed)
+    _output_logger = (
+        output.NoLogger()
+        if args.disable_logs
+        else output.Logger(folder=args.log_folder, filename=args.log_filename_suffix)
+    )
+    with _output_logger as logger:
+        logger.info("Seed: %s", args.seed)
         run_game(
-            Game.create_default(),
-            GameParams(depth=3),
-            player_move_source=move_player_by_cli,
+            init_game(args),
+            GameParams(depth=args.depth, resign_threshold=args.resign_threshold),
+            player_move_source=(
+                move_player_by_cli if args.mode == "cli" else move_player_automatically
+            ),
             renderer=print,
             logger=logger,
-            moves=50,
+            moves=args.max_moves,
         )
 
 

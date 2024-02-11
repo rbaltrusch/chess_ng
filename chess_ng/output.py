@@ -8,6 +8,28 @@ import datetime
 import logging
 import os
 import sys
+from typing import Any, Protocol
+
+
+class LoggerProtocol(Protocol):
+    """Protocol of a simple info logger"""
+
+    def info(
+        self, msg: str, *args: Any
+    ) -> None: ...  # pylint: disable=missing-function-docstring
+
+
+class NoLogger:
+    """No-op logger"""
+
+    def __enter__(self) -> LoggerProtocol:
+        return self
+
+    def __exit__(self, *_):
+        pass
+
+    def info(self, msg: str, *args: Any) -> None:  # pylint: disable=unused-argument
+        """Does nothing"""
 
 
 class Logger:
@@ -18,7 +40,7 @@ class Logger:
         self.filename = filename
         self.logger: logging.Logger = None  # type: ignore
 
-    def __enter__(self):
+    def __enter__(self) -> LoggerProtocol:
         self._init_folder()
         self._init_logger()
         return self.logger
@@ -32,7 +54,7 @@ class Logger:
         self.logger.handlers.clear()
 
         now = datetime.datetime.now().strftime("%y%m%d_%H%M%S")
-        filepath = os.path.join(self.folder, f"{now}_game.log")
+        filepath = os.path.join(self.folder, f"{now}_{self.filename}")
         file_handler = logging.FileHandler(filepath, mode="w")
         file_handler.setLevel(logging.DEBUG)
         self.logger.addHandler(file_handler)
