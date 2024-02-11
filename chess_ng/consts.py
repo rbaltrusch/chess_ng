@@ -22,6 +22,7 @@ BLACK = "2"
 BACKROW = [ROOK, KNIGHT, BISHOP, QUEEN, KING, BISHOP, KNIGHT, ROOK]
 FRONTROW = [PAWN] * 8
 
+STARTING_FEN = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR/ w - - 1 1 white"
 BOARD = [
     [piece + BLACK for piece in BACKROW],
     [piece + BLACK for piece in FRONTROW],
