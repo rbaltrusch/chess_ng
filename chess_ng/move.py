@@ -6,7 +6,7 @@ Created on Mon Feb  8 12:56:04 2021
 """
 import itertools
 from dataclasses import dataclass
-from typing import List
+from typing import Generator, List
 
 from chess_ng.interfaces import Board, Direction, Piece
 from chess_ng.util import Move
@@ -19,31 +19,32 @@ class LineMove:
 
     range_: int
     direction: int = 1
-    forward_only: bool = False
     horz_move: bool = False
     can_capture: bool = False
 
     def compute_valid_moves(self, board: Board, piece: Piece) -> List[Move]:
         """Computes all valid moves that can be made from the passed position"""
         x, y = piece.position
-        horz_moves = self._compute_horz_moves(x, y, board, piece.team)
-        vert_moves = self._compute_vert_moves(x, y, board, piece.team)
-        return horz_moves + vert_moves
+        return list(
+            itertools.chain(
+                self._compute_horz_moves(x, y, board, piece.team),
+                self._compute_vert_moves(x, y, board, piece.team),
+            )
+        )
 
     def _compute_horz_moves(
         self, current_x: int, y: int, board: Board, team: str
-    ) -> List[Move]:
-        moves: List[Move] = []
+    ) -> Generator[Move, None, None]:
         if not self.horz_move:
-            return moves
+            return
 
         # forward
         for x in range(current_x + 1, board.size):
             square = board[x, y]
             if square is None:
-                moves.append(Move((x, y)))
+                yield Move((x, y))
             elif board.is_enemy((x, y), team):
-                moves.append(Move((x, y), can_capture=True))
+                yield Move((x, y), can_capture=True)
             if square is not None:
                 break
 
@@ -51,46 +52,38 @@ class LineMove:
         for x in range(current_x - 1, -1, -1):
             square = board[x, y]
             if square is None:
-                moves.append(Move((x, y)))
+                yield Move((x, y))
             else:
                 if board.is_enemy((x, y), team) and self.can_capture:
-                    moves.append(Move((x, y), can_capture=True))
+                    yield Move((x, y), can_capture=True)
                 break
-
-        return moves
 
     def _compute_vert_moves(
         self, x: int, current_y: int, board: Board, team: str
-    ) -> List[Move]:
-        forward_moves: List[Move] = []
+    ) -> Generator[Move, None, None]:
         for y in range(current_y - 1, current_y - 1 - self.range_, -1):
             if y < 0:
                 break
 
             square = board[x, y]
             if square is None:
-                forward_moves.append(Move((x, y)))
+                yield Move((x, y))
             else:
                 if board.is_enemy((x, y), team) and self.can_capture:
-                    forward_moves.append(Move((x, y), can_capture=True))
+                    yield Move((x, y), can_capture=True)
                 break
 
-        backward_moves: List[Move] = []
         for y in range(current_y + 1, current_y + 1 + self.range_):
             if y >= board.size:
                 break
 
             square = board[x, y]
             if square is None:
-                backward_moves.append(Move((x, y)))
+                yield Move((x, y))
             else:
                 if board.is_enemy((x, y), team) and self.can_capture:
-                    backward_moves.append(Move((x, y), can_capture=True))
+                    yield Move((x, y), can_capture=True)
                 break
-
-        if self.forward_only:
-            return forward_moves if self.direction == -1 else backward_moves
-        return forward_moves + backward_moves
 
 
 # pylint: disable=too-few-public-methods
