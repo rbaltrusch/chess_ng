@@ -37,6 +37,11 @@ setuptools.setup(
         "Programming Language :: Python :: 3.8",
         "Programming Language :: Python :: 3.9",
         "Programming Language :: Python :: 3.10",
+        "Topic :: Games/Entertainment",
+        "Topic :: Games/Entertainment :: Board Games",
+        "Topic :: Games/Entertainment :: Simulation",
+        "Topic :: Scientific/Engineering :: Artificial Intelligence",
+        "Environment :: Console",
         "Typing :: Typed",
     ],
 )
