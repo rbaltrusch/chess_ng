@@ -4,11 +4,15 @@ Created on Fri Jan  7 14:33:33 2022
 
 @author: richa
 """
+import logging
 import math
 from dataclasses import dataclass
 from typing import Callable, Dict, List, Optional, Protocol, Tuple, Union
 
-import numpy as np
+try:
+    import numpy as np
+except ImportError:
+    logging.warning("Failed to import numpy")
 
 from chess_ng.board import BitBoard, Board
 from chess_ng.hashing import compute_hash
@@ -26,13 +30,11 @@ class _TeamInterface(Protocol):
 
     def compute_all_moves(  # pylint: disable=missing-function-docstring
         self, board: Board
-    ) -> List[Tuple[Piece, Move]]:
-        ...
+    ) -> List[Tuple[Piece, Move]]: ...
 
     def compute_valid_moves(  # pylint: disable=missing-function-docstring
         self, board: Board, enemy_pieces: List[Piece]
-    ) -> List[Tuple[Piece, Move]]:
-        ...
+    ) -> List[Tuple[Piece, Move]]: ...
 
 
 @dataclass
@@ -131,6 +133,7 @@ def mating_strategy(board: Board, team: _TeamInterface, enemy: _TeamInterface):
 
 def evaluate_distance(board: Board, team: _TeamInterface, enemy: _TeamInterface):
     """Evaluates board state based on the closeness to the enemy king"""
+
     # HACK: using compute_all_moves instead of compute_valid_moves to save computation time
     # pylint: disable=invalid-name
     def inverse_distance(point1: Tuple[int, int], point2: Tuple[int, int]):
