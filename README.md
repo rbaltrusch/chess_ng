@@ -31,11 +31,45 @@ Install the package using pip, then run it using:
     python -m pip install chess_ng
     python -m chess_ng
 
-## Next up: Machine learning ?
+## Documentation
 
-With weighted square parameters being given to improve the positional play of the AI, it seems to be a logical next step to improve the AI using machine learning by combining random parameter adjustments with a genetic algorithm.
+### CLI
 
-## Graphical chess board
+The command line options for the `chess_ng` package are the following:
+
+```
+usage: chess_ng [-h] [--depth DEPTH] [--mode {cli,auto}] [--player {1,2}] [--fen FEN] [--eval-algorithm {moves,move-distance}]
+                [--resign-threshold RESIGN_THRESHOLD] [--max-moves MAX_MOVES] [--seed SEED] [--log-folder LOG_FOLDER]
+                [--log-filename-suffix LOG_FILENAME_SUFFIX] [--disable-logs]
+
+A Python chess engine
+
+optional arguments:
+  -h, --help            show this help message and exit
+  --depth DEPTH, -d DEPTH
+                        The minimax depth to use
+  --mode {cli,auto}, -m {cli,auto}
+                        The player mode
+  --player {1,2}, -p {1,2}
+                        The player colour
+  --fen FEN, -f FEN     The FEN string with which to initialise the game
+  --eval-algorithm {moves,move-distance}, -e {moves,move-distance}
+                        The evaluation algorithm to use in minimax
+  --resign-threshold RESIGN_THRESHOLD, -r RESIGN_THRESHOLD
+                        The position rating at which to surrender
+  --max-moves MAX_MOVES, --max MAX_MOVES
+                        The maximum amount of moves to play
+  --seed SEED, -s SEED  The random seed to be used
+  --log-folder LOG_FOLDER
+                        The folder to which logfiles are written
+  --log-filename-suffix LOG_FILENAME_SUFFIX
+                        The name suffix for logfiles
+  --disable-logs        Disables log files from being written
+```
+
+To print the help message, run `python -m chess_ng -h`.
+
+### Graphical chess board
 
 To render a graphical chess board using the `chess_ng.renderer.ImageRenderer`, the class expects images of size 60x60 in the following tree structure at the root of the repository:
 
