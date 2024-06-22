@@ -26,3 +26,4 @@ jobs:
           pip install setuptools
           pip install $PACKAGE_NAME
           python -m $PACKAGE_NAME -h
+          python -m chess_ng --mode=auto --depth=3 --max-moves=15
